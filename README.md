@@ -5,7 +5,8 @@ Convertron3000 is a graphics converter for Commodore 64 computers.
 ## Getting Started
 
 As it is written in Python2.7 it depends a little on which OS you are starting Convertron3000.
-On Linux and Mac OS you might want to install needed modules first (see Prerequisites). On Windows you may want to use the contents of the ZIP file and start the .exe.
+On Linux and Mac OS you might want to install needed modules first (see Prerequisites).
+On Windows you may want to use the contents of the ZIP file and start the .exe.
 
 ### Prerequisites
 
@@ -31,6 +32,7 @@ There is nothing to install apart from the prerequisites.
 ## License
 
 Convertron3000 Commodore 64 graphics converter
+
 Copyright (C) 2017 fieserWolF / Abyss-Connection
 
 This program is free software: you can redistribute it and/or modify
