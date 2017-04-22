@@ -1,0 +1,23 @@
+Future plans
+============
+* ordered dithering: too high values in ordered dithering modes, slider to control strenght
+* custom brightness palette editor
+
+
+Changes in 1.01
+===============
+* added licenses
+
+
+Changes in 1.0
+==============
+* hires mode
+* colodore palette
+* button: reset color modifiers to default
+* start address now in hex
+* custom brightness palette (config file)
+
+
+Changes in 0.1
+==============
+initial release
