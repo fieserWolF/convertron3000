@@ -25,7 +25,6 @@ wolf@abyss-connection.de
 For Python2.7, The Python Imaging Library (PIL), Numpy, Tcl/Tk and other used source licenses see file "LICENSE_OTHERS".
 """
 
-
 #to do
 ##########
 #https://github.com/justmao945/lab/tree/master/halftoning/ordered-dithering
@@ -2142,7 +2141,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 For futher questions, please contact me at
 http://csdb.dk/scener/?id=3623 or wolf@abyss-connection.de
 
-For Python2.7, The Python Imaging Library (PIL), Numpy and Tcl/Tk licenses see file "licenses.txt".\
+For Python2.7, The Python Imaging Library (PIL), Numpy, Tcl/Tk and other used source licenses see file "LICENSE_OTHERS".\
     """ % (PROGNAME, VERSION, DATUM)
 
     frame_left = Frame( about_window)
