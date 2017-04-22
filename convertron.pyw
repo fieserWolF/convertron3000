@@ -25,6 +25,7 @@ wolf@abyss-connection.de
 For Python2.7, The Python Imaging Library (PIL), Numpy, Tcl/Tk and other used source licenses see file "LICENSE_OTHERS".
 """
 
+
 #to do
 ##########
 #https://github.com/justmao945/lab/tree/master/halftoning/ordered-dithering
