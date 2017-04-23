@@ -36,7 +36,6 @@ For Python2.7, The Python Imaging Library (PIL), Numpy, Tcl/Tk and other used so
 
 
 
-
 about_graphic = """
 R0lGODdhZABkAOf/AAABACAjNy0lOSYqNywqNyksQDMsQDIwPTQ0RzA2RDo0STY3PzE3Tzo3RT42
 RSw7SzE7Rig+TSw+RzM+SS5ASitBUDBCTDs/TEI9TDlAUT5ASD8/VDJETi9FVDRGUC5FdjJIVz5E
