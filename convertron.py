@@ -563,7 +563,8 @@ def koala_colorindex_to_rgb(
 
 
 
-def koala_to_image_single_block(x,y) :
+def koala_to_image(
+):
     global koala_colorindex_data
 
     SHR_PRE = [
@@ -573,106 +574,35 @@ def koala_to_image_single_block(x,y) :
         0
     ]
 
-    pos = ((y*C64_CHAR_WIDTH)+x)*8
-    this_block = koala_bitmap[ pos:pos+8]   #this_block holds 8 bytes
-#    print(this_block)
-
-    for row in range(0, 8):
-        this_row = this_block[row]
-        
-        for column in range(0, 4):
-            iy = y*8    +row
-            ix = x*4    +column
-
-            #normal data
-            koalaindex = (this_row >> SHR_PRE[column]) & 0b00000011 #result should be 0..3
-            koala_colorindex_data[iy*KOALA_WIDTH+ix] = koala_index_to_colorindex(koalaindex,x,y)
-
-
-
-
-def koala_to_image(
-):
     for y in range(0, C64_CHAR_HEIGHT):
         for x in range(0, C64_CHAR_WIDTH):
-            koala_to_image_single_block(x,y)
-
-
-
-
-def koala_to_image_old(
-):
-    #constants
-    SHR_PRE = [
-        6,
-        4,
-        2,
-        0
-    ]
-    
-    global koala_preview_image_data
-
-    for y in range(0, C64_CHAR_HEIGHT):
-        for x in range(0, C64_CHAR_WIDTH):
-            this_block = koala_bitmap[ (y*C64_CHAR_WIDTH+x)]   #this_block holds 8 bytes
+            pos = ((y*C64_CHAR_WIDTH)+x)*8
+            this_block = koala_bitmap[ pos:pos+8]   #this_block holds 8 bytes
+        #    print(this_block)
 
             for row in range(0, 8):
                 this_row = this_block[row]
                 
                 for column in range(0, 4):
-                    koalaindex = (this_row >> SHR_PRE[column]) & 0b00000011 #result should be 0..3
-                    colorindex = koala_index_to_colorindex(koalaindex,x,y)
-                    rgb_color = koala_colorindex_to_rgb(colorindex) #rgb_color holds 3 bytes
-                    
                     iy = y*8    +row
                     ix = x*4    +column
-                                        
-                    koala_preview_image_data[iy][ix] = rgb_color 
+
+                    #normal data
+                    koalaindex = (this_row >> SHR_PRE[column]) & 0b00000011 #result should be 0..3
+                    koala_colorindex_data[iy*KOALA_WIDTH+ix] = koala_index_to_colorindex(koalaindex,x,y)
 
 
 
 
-def hires_to_image_single_block(x,y) :
-    global koala_colorindex_data
 
-    #constants
-    SHR_PRE = [
-        7,
-        6,
-        5,
-        4,
-        3,
-        2,
-        1,
-        0
-    ]
-
-    pos = ((y*C64_CHAR_WIDTH)+x)*8
-    this_block = koala_bitmap[ pos:pos+8]   #this_block holds 8 bytes
-
-    for row in range(0, 8):
-        this_row = this_block[row]
-        
-        for column in range(0, 8):
-            my_index = (this_row >> SHR_PRE[column]) & 0b00000001 #result should be 0..1
-
-            iy = y*8    +row
-            ix = x*8    +column
-
-            hires_colorindex_data[iy*HIRES_WIDTH+ix] = hires_index_to_colorindex(my_index,x,y)
 
 
 
 
 def hires_to_image(
 ):
-    for y in range(0, C64_CHAR_HEIGHT):
-        for x in range(0, C64_CHAR_WIDTH):
-            hires_to_image_single_block(x,y)
+    global koala_colorindex_data
 
-
-def hires_to_image_old(
-):
     #constants
     SHR_PRE = [
         7,
@@ -684,29 +614,22 @@ def hires_to_image_old(
         1,
         0
     ]
-    
-    global koala_preview_image_data
 
     for y in range(0, C64_CHAR_HEIGHT):
         for x in range(0, C64_CHAR_WIDTH):
-            this_block = koala_bitmap[ (y*C64_CHAR_WIDTH+x)]   #this_block holds 8 bytes
+            pos = ((y*C64_CHAR_WIDTH)+x)*8
+            this_block = koala_bitmap[ pos:pos+8]   #this_block holds 8 bytes
 
             for row in range(0, 8):
                 this_row = this_block[row]
                 
                 for column in range(0, 8):
-                    hiresindex = (this_row >> SHR_PRE[column]) & 0b00000001 #result should be 0..1
-                    colorindex = hires_index_to_colorindex(hiresindex,x,y)
-                    rgb_color = koala_colorindex_to_rgb(colorindex) #rgb_color holds 3 bytes
-                    
+                    my_index = (this_row >> SHR_PRE[column]) & 0b00000001 #result should be 0..1
+
                     iy = y*8    +row
                     ix = x*8    +column
-                                        
-                    hires_preview_image_data[iy][ix] = rgb_color 
 
-
-
-
+                    hires_colorindex_data[iy*HIRES_WIDTH+ix] = hires_index_to_colorindex(my_index,x,y)
 
 
  
