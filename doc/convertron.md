@@ -1,7 +1,7 @@
 # Convertron3000
 
 Convertron3000 is a graphics converter for Commodore 64 computers.
-It runs on 64 bit versions of Linux, MacOS and Windows.
+It runs on 64 bit versions of Linux, MacOS, Windows and other systems supported by Python. 
 
 
 # Why Convertron3000?
@@ -9,7 +9,7 @@ It runs on 64 bit versions of Linux, MacOS and Windows.
 reason | description
 ---|---
 open source | easy to modify and to improve, any useful contribution is highly welcome
-portable | available on Linux, MacOS, Darwin and any other system supported by Python3
+portable | available on Linux, MacOS, Windows and any other system supported by Python3
 instant preview | just fiddle around with the sliders and see the result before converting
 
 
@@ -105,6 +105,12 @@ At least this is needed to run the script directly:
 - python 3
 - python tkinter module
 - python "The Python Imaging Library" (PIL)
+
+
+Normally, you would use pip like this:
+```
+pip install tk pillow
+```
 
 On my Debian GNU/Linux machine I use apt-get to install everything needed:
 ```
