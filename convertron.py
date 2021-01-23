@@ -316,17 +316,12 @@ koala_colorindex_data = [0] * KOALA_WIDTH*KOALA_HEIGHT
 hires_colorindex_data = [0] * HIRES_WIDTH*HIRES_HEIGHT
 
 #initialize empty 320x200 data
-#koala_preview_image_data = [[ [0] * 3 ] * 160 ] * 200
-#koala_preview_image_data = numpy.zeros((200, 160, 3), dtype=numpy.uint8)
 image_result_koala = PilImage.new("P", (KOALA_WIDTH, KOALA_HEIGHT))
 
-#hires_preview_image_data = [[ [0] * 3 ] * 160 ] * 200
-#hires_preview_image_data = numpy.zeros((200, 320, 3), dtype=numpy.uint8)
 image_result_hires = PilImage.new("P", (HIRES_WIDTH, HIRES_HEIGHT))
 
 scale_modifier_list=[]
 
-#user_custom_gradient_sceme = numpy.array([0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0])
 user_custom_gradient_sceme = [0] * 8
 user_custom_gradient_sceme_size = 0
 
@@ -388,7 +383,11 @@ def ordered_dithering( pixel, size, matrix ):
     T = [[255*(matrix[x][y]+0.5)/N/N for x in range(N)] for y in range(N)]
     for y in range(0, Y):
         for x in range(0, X):
-            pixel[x,y] = 255 if pixel[x,y] > T[x%N][y%N] else 0
+#            pixel[x,y] = 255 if pixel[x,y] > T[x%N][y%N] else 0
+            if pixel[x,y] > T[x%N][y%N] :
+                pixel[x,y] = 255
+            else
+                pixel[x,y] = 0
 
 
 

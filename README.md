@@ -106,9 +106,10 @@ At least this is needed to run the script directly:
 - python tkinter module
 - python "The Python Imaging Library" (PIL)
 
+
 Normally, you would use pip like this:
 ```
-pip install tkinter pillow
+pip install tk pillow
 ```
 
 On my Debian GNU/Linux machine I use apt-get to install everything needed:
