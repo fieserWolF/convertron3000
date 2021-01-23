@@ -109,7 +109,7 @@ At least this is needed to run the script directly:
 
 Normally, you would use pip like this:
 ```
-pip install tk pillow
+pip3 install tk pillow
 ```
 
 On my Debian GNU/Linux machine I use apt-get to install everything needed:
