@@ -115,7 +115,7 @@ pip3 install tk pillow
 On my Debian GNU/Linux machine I use apt-get to install everything needed:
 ```
 apt-get update
-apt-get install python3 python3-tk python3-pil
+apt-get install python3 python3-tk python3-pil python3-pil.imagetk
 ```
 
 
