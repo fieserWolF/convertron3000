@@ -322,7 +322,7 @@ image_result_hires = PilImage.new("P", (HIRES_WIDTH, HIRES_HEIGHT))
 
 scale_modifier_list=[]
 
-user_custom_gradient_sceme = [0] * 8
+user_custom_gradient_sceme = [0] * 16
 user_custom_gradient_sceme_size = 0
 
 
@@ -342,10 +342,8 @@ def config_read(
     
     user_custom_gradient_sceme_size = int(config['size'])
 
-    for a in range(0,16) :
+    for a in range(0,len(user_custom_gradient_sceme)) :
         user_custom_gradient_sceme[a] = int(config['color'+str(a)])
-        
-
 
 
 
@@ -386,7 +384,7 @@ def ordered_dithering( pixel, size, matrix ):
 #            pixel[x,y] = 255 if pixel[x,y] > T[x%N][y%N] else 0
             if pixel[x,y] > T[x%N][y%N] :
                 pixel[x,y] = 255
-            else
+            else :
                 pixel[x,y] = 0
 
 
