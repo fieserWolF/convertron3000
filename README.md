@@ -23,6 +23,25 @@ Using Convertron3000 is pretty straight-forward:
 * Save the resulting image.
 
 
+# Dithering
+
+As of now, Convertron3000 offers various dithering methods.
+As the PIL-library only implements "floyd-steinberg"-dithering, all other dithering methods were taken from the hitherdither library.
+
+reason | description
+---|---
+floyd-steinberg dithering | speedy performance from the PIL-library
+bayer-ordered dithering | the speedy standard, my favourite for C64 pictures
+line dithering | a modified bayer-ordered dithering method, sometimes looks better than normal ordered dithering
+dot dithering | not my favourite, but might give nice results on some pictures
+yliluomas1 dithering | Warning: Painfully slow - use with care! The results are stunningly good sometimes, though.
+
+
+Please, take note that all dithering implementations except "floyd-steinberg"-dithering are quite slow when using the "Brightness palette"-mode, which is described below.
+
+
+
+
 # Brightness palette
 
 Sometimes converted images look better when applying a palette based on brightness values.
@@ -66,16 +85,18 @@ Acknowledgments
 
 * thanks to [Green/ATW](http://csdb.dk/scener/?id=20695) for spontaneously naming Convertron3000 :)
 * thanks to people on [csdb.dk](http://csdb.dk/release/?id=155606) for commenting and giving ideas how to improve
+* thanks to Henrik Blidh for his hitherdither library [https://github.com/hbldh/hitherdither](https://github.com/hbldh/hitherdither) which I use
 # Getting Started
 
 Convertron3000 comes in two flavors:
 
-- standalone executable for 64-bit systems Linux, MacOS/Darwin and Windows
+- standalone executable for 64-bit systems Linux, MacOS/Darwin and Windows (see [releases](https://github.com/fieserWolF/convertron3000/releases))
 - Python3 script
 
 ## Run the standalone executable
 
-Just download your bundle and enjoy. Keep in mind that only 64bit systems are supported as I could not find a 32bit system to generate the bundle.
+Just download your bundle at [releases](https://github.com/fieserWolF/convertron3000/releases) and enjoy.
+Keep in mind that only 64bit systems are supported as I could not find a 32bit system to generate the bundle.
 
 ### Note for Windows users
 
@@ -105,17 +126,19 @@ At least this is needed to run the script directly:
 - python 3
 - python tkinter module
 - python "The Python Imaging Library" (PIL)
+- python "hitherdither" library
 
 
 Normally, you would use pip like this:
 ```
-pip3 install tk pillow
+pip3 install tk pillow git+https://www.github.com/hbldh/hitherdither
 ```
 
 On my Debian GNU/Linux machine I use apt-get to install everything needed:
 ```
 apt-get update
 apt-get install python3 python3-tk python3-pil python3-pil.imagetk
+pip3 install git+https://www.github.com/hbldh/hitherdither
 ```
 
 
@@ -123,7 +146,6 @@ apt-get install python3 python3-tk python3-pil python3-pil.imagetk
 
 ## Future plans
 
-- ordered dithering: too high values in ordered dithering modes, slider to control dithering strength
 - custom brightness palette editor
 
 Any help and support in any form is highly appreciated.
@@ -134,6 +156,13 @@ If you have a feature request, a bug report or if you want to offer help, please
 [http://csdb.dk/scener/?id=3623](http://csdb.dk/scener/?id=3623)
 or
 [wolf@abyss-connection.de](wolf@abyss-connection.de)
+
+
+## Changes in 1.2
+
+- proper dithering support: bayer-ordered, line dither and some others
+- GUI improvements
+- moved standalone executables to [releases](https://github.com/fieserWolF/convertron3000/releases)
 
 
 ## Changes in 1.1
@@ -172,7 +201,7 @@ or
 
 _Convertron3000 is a graphics converter for Commodore 64 computers._
 
-_Copyright (C) 2021 fieserWolF / Abyss-Connection_
+_Copyright (C) 2022 fieserWolF / Abyss-Connection_
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
