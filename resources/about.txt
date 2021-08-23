@@ -2,7 +2,8 @@ Convertron3000
 ==============
 
 Convertron3000 is a graphics converter for Commodore 64 computers. It
-runs on 64 bit versions of Linux, MacOS and Windows.
+runs on 64 bit versions of Linux, MacOS, Windows and other systems
+supported by Python.
 
 Why Convertron3000?
 ===================
@@ -14,9 +15,9 @@ Why Convertron3000?
 |                                   | any useful contribution is highly |
 |                                   | welcome                           |
 +-----------------------------------+-----------------------------------+
-| portable                          | available on Linux, MacOS, Darwin |
-|                                   | and any other system supported by |
-|                                   | Python3                           |
+| portable                          | available on Linux, MacOS,        |
+|                                   | Windows and any other system      |
+|                                   | supported by Python3              |
 +-----------------------------------+-----------------------------------+
 | instant preview                   | just fiddle around with the       |
 |                                   | sliders and see the result before |
@@ -32,6 +33,40 @@ Using Convertron3000 is pretty straight-forward:
 -  Adjust the sliders or apply an effect.
 -  Convert to koala or hires format.
 -  Save the resulting image.
+
+Dithering
+=========
+
+As of now, Convertron3000 offers various dithering methods. As the
+PIL-library only implements “floyd-steinberg”-dithering, all other
+dithering methods were taken from the hitherdither library.
+
++-----------------------------------+-----------------------------------+
+| reason                            | description                       |
++===================================+===================================+
+| floyd-steinberg dithering         | speedy performance from the       |
+|                                   | PIL-library                       |
++-----------------------------------+-----------------------------------+
+| bayer-ordered dithering           | the speedy standard, my favourite |
+|                                   | for C64 pictures                  |
++-----------------------------------+-----------------------------------+
+| line dithering                    | a modified bayer-ordered          |
+|                                   | dithering method, sometimes looks |
+|                                   | better than normal ordered        |
+|                                   | dithering                         |
++-----------------------------------+-----------------------------------+
+| dot dithering                     | not my favourite, but might give  |
+|                                   | nice results on some pictures     |
++-----------------------------------+-----------------------------------+
+| yliluomas1 dithering              | Warning: Painfully slow - use     |
+|                                   | with care! The results are        |
+|                                   | stunningly good sometimes,        |
+|                                   | though.                           |
++-----------------------------------+-----------------------------------+
+
+Please, take note that all dithering implementations except
+“floyd-steinberg”-dithering are quite slow when using the “Brightness
+palette”-mode, which is described below.
 
 Brightness palette
 ==================
@@ -80,13 +115,13 @@ Acknowledgments
 -  thanks to `Green/ATW <http://csdb.dk/scener/?id=20695>`__ for
    spontaneously naming Convertron3000 :)
 -  thanks to people on `csdb.dk <http://csdb.dk/release/?id=155606>`__
-   for commenting and giving ideas how to improve # Changelog
+   for commenting and giving ideas how to improve
+-  thanks to Henrik Blidh for his hitherdither library
+   https://github.com/hbldh/hitherdither which I use # Changelog
 
 Future plans
 ------------
 
--  ordered dithering: too high values in ordered dithering modes, slider
-   to control dithering strength
 -  custom brightness palette editor
 
 Any help and support in any form is highly appreciated.
@@ -96,6 +131,14 @@ help, please, contact me:
 
 http://csdb.dk/scener/?id=3623 or
 `wolf@abyss-connection.de <wolf@abyss-connection.de>`__
+
+Changes in 1.2
+--------------
+
+-  proper dithering support: bayer-ordered, line dither and some others
+-  GUI improvements
+-  moved standalone executables to
+   `releases <https://github.com/fieserWolF/convertron3000/releases>`__
 
 Changes in 1.1
 --------------
@@ -136,7 +179,7 @@ License
 
 *Convertron3000 is a graphics converter for Commodore 64 computers.*
 
-*Copyright (C) 2021 fieserWolF / Abyss-Connection*
+*Copyright (C) 2022 fieserWolF / Abyss-Connection*
 
 This program is free software: you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the
@@ -974,15 +1017,14 @@ Government and others acting in its behalf permission to use and
 distribute the software in accordance with the terms specified in this
 license.
 
-Ordered-dithering sources
-=========================
+hitherdither-library
+====================
 
-https://github.com/justmao945/lab/tree/master/halftoning/ordered-dithering
-source used
+https://github.com/hbldh/hitherdither library used
 
 The MIT License (MIT)
 
-Copyright (c) 2014 JianjunMao
+Copyright (c) 2020 Henrik Blidh
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the

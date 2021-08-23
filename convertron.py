@@ -25,20 +25,11 @@ wolf@abyss-connection.de
 For Python3, The Python Imaging Library (PIL), Numpy, Tcl/Tk and other used source licenses see file "LICENSE_OTHERS".
 """
 
-#to do
-##########
-#https://github.com/justmao945/lab/tree/master/halftoning/ordered-dithering
-#ordered-dithering
-#the big problem is: you cannot specify a palette to map to!
-#so the results are not optimal... (to do)
-#
-#ordered dithering: too high values in ordered dithering modes. If you lower those values down it would look better. Probably adding a slider to control strenght of ordered dithering would be good feature.
-
 
 
 import os
 import sys
-#import hitherdither    #does not work
+import hitherdither
 import struct
 from PIL import ImageTk, ImageEnhance, ImageFilter
 import PIL.Image as PilImage    #we need another name, as it collides with tkinter.Image otherwise
@@ -252,6 +243,23 @@ CURSOR_HAND = 'hand2'
 
 
 
+
+
+
+ERROR_DIFFUSION = (
+    'Floyd-Steinberg',
+    'Jarvis-Judice-Ninke',
+    'Stucki',
+    'Burkes',
+    'Sierra3',
+    'Sierra2',
+    'Sierra-2-4A',
+    'Stevenson-Arce',
+    'Atkinson'
+)
+
+
+
 #global variables
 def _global_variables():
         return None
@@ -264,6 +272,7 @@ user_filename_save = "none"
 user_start_address = StringVar()
 user_start_address_checkbutton = IntVar()
 user_sharpness = IntVar()
+user_treshold = IntVar()
 user_color_saturation = IntVar()
 user_brightness = IntVar()
 user_contrast = IntVar()
@@ -280,11 +289,9 @@ user_effects_enhance_more = IntVar()
 user_effects_smooth = IntVar()
 user_effects_smooth_more = IntVar()
 user_effects_sharpen = IntVar()
-user_effects_dither_floyd_steinberg = IntVar()
-user_effects_dither_ordered1 = IntVar()
-user_effects_dither_ordered2 = IntVar()
 
 user_gradient_sceme = StringVar()
+user_dithering = StringVar()
 user_backgroundcolor = IntVar()
 user_backgroundcolor.set(99)
 
@@ -292,10 +299,11 @@ user_backgroundcolor.set(99)
 #defaults
 user_outputformat.set("koala")
 user_modes.set("colors")
-user_palette.set("colodore")
+user_palette.set("pepto")
 user_gradient_sceme.set("purple")
 user_filename_open_textvariable.set("none")
 convertbutton_text.set("convert\nAlt+C")
+user_dithering.set("bayer")
 
 
 textbox = Text()
@@ -321,9 +329,37 @@ image_result_koala = PilImage.new("P", (KOALA_WIDTH, KOALA_HEIGHT))
 image_result_hires = PilImage.new("P", (HIRES_WIDTH, HIRES_HEIGHT))
 
 scale_modifier_list=[]
+scale_modifier_list_default=[]
 
 user_custom_gradient_sceme = [0] * 16
 user_custom_gradient_sceme_size = 0
+
+
+
+#hitherdither
+def convert_to_hitherdither_palette (
+    palette_rgb
+) :
+    pal = []
+    cnt = 0
+    for value in palette_rgb :
+        if (cnt == 0 ) : r = value
+        if (cnt == 1 ) : g = value
+        if (cnt == 2 ) :
+            b = value
+            rgb = (r * 256 * 256) + (g * 256) + b
+            pal.append(rgb)
+            cnt = -1
+        cnt += 1
+    return pal
+
+hitherdither_palette = hitherdither.palette.Palette(convert_to_hitherdither_palette(PALETTEDATA_PEPTO))  #do to
+hitherdither_tres_value=256/8    #play around with tresholds
+hitherdither_tresholds = [hitherdither_tres_value, hitherdither_tres_value, hitherdither_tres_value]
+hitherdither_order=8  #2,4,8,16,32,64,128
+
+
+
 
 
 
@@ -368,13 +404,14 @@ def gen_matrix( e ):
   return m_list
 
 
+"""
 def ordered_dithering( pixel, size, matrix ):
 #https://github.com/justmao945/lab/tree/master/halftoning/ordered-dithering
-    """ Dithering on a single channel.
-    @param pixel PIL PixelAccess object.
-    @param size A tuple to represent the size of pixel.
-    @param matrix Must be NxN, and N == 2^e where e>=1
-    """
+    #Dithering on a single channel.
+    #@param pixel PIL PixelAccess object.
+    #@param size A tuple to represent the size of pixel.
+    #@param matrix Must be NxN, and N == 2^e where e>=1
+
     X, Y = size
     N = len(matrix)
 
@@ -386,7 +423,7 @@ def ordered_dithering( pixel, size, matrix ):
                 pixel[x,y] = 255
             else :
                 pixel[x,y] = 0
-
+"""
 
 
 
@@ -397,6 +434,7 @@ def ordered_dithering( pixel, size, matrix ):
 
 def image_quantize_c64_colors(image):
     pal_image= PilImage.new("P", (1,1))
+    
 
     switcher_palette = {
         'pepto': PALETTEDATA_PEPTO,
@@ -406,33 +444,39 @@ def image_quantize_c64_colors(image):
     }
     my_palettedata = switcher_palette.get(user_palette.get(), PALETTEDATA_PEPTO)
     
-    pal_image.putpalette(
-        (my_palettedata)
-        +(0,0,0)*(256-16)
-    )
-    
-    #https://github.com/justmao945/lab/tree/master/halftoning/ordered-dithering
-    """
-    ordered-dithering
-    the big problem is: you cannot specify a palette to map to!
-    so the results are not optimal... (to do)
-    """
-    e=0
-    if (int(user_effects_dither_ordered1.get())== 1) : e=1
-    if (int(user_effects_dither_ordered2.get())== 1) : e=2
-    if (e>0):            # only values 1 and 2 will result in ordered dithering
-        image = image.convert('CMYK').split()
-        for ch in image:
-            ordered_dithering(ch.load(), ch.size, gen_matrix(e)[e-1])
-        image = PilImage.merge("CMYK",image).convert("RGB")
+    hitherdither_tresholds = [256/user_treshold.get(), 256/user_treshold.get(), 256/user_treshold.get()]
 
-    #quantizise to palette (either undithered or floyd_steinberg dithered
-    quantisized_image = image.im.convert(
-        "P",
-        int(user_effects_dither_floyd_steinberg.get()),
-        pal_image.im
-    )
-    image = image._new(quantisized_image)
+    #https://github.com/justmao945/lab/tree/master/halftoning/ordered-dithering
+    if (user_dithering.get() == 'bayer') :
+        hitherdither_palette = hitherdither.palette.Palette(convert_to_hitherdither_palette(my_palettedata))
+        image = hitherdither.ordered.bayer.bayer_dithering(image, hitherdither_palette, hitherdither_tresholds, order=hitherdither_order)
+    if (user_dithering.get() == 'yliluomas1') :
+        hitherdither_palette = hitherdither.palette.Palette(convert_to_hitherdither_palette(my_palettedata))
+        image = hitherdither.ordered.yliluoma.yliluomas_1_ordered_dithering(image, hitherdither_palette, order=hitherdither_order)
+    if (user_dithering.get() == 'line') :
+        hitherdither_palette = hitherdither.palette.Palette(convert_to_hitherdither_palette(my_palettedata))
+        image = image.resize((320,200))
+        image = hitherdither.ordered.bayer.bayer_dithering(image, hitherdither_palette, hitherdither_tresholds, order=hitherdither_order)
+        image = image.resize((160,200))
+    if (user_dithering.get() == 'dots') :
+        hitherdither_palette = hitherdither.palette.Palette(convert_to_hitherdither_palette(my_palettedata))
+        image = hitherdither.ordered.cluster.cluster_dot_dithering(image, hitherdither_palette, hitherdither_tresholds, order=hitherdither_order)
+
+    if (user_dithering.get() == 'floyd-steinberg') :
+        pal_image.putpalette(
+            (my_palettedata)
+            +(0,0,0)*(256-16)
+        )
+        quantisized_image = image.im.convert("P",1,pal_image.im)
+        image = image._new(quantisized_image)
+
+    if (user_dithering.get() == 'none') :
+        pal_image.putpalette(
+            (my_palettedata)
+            +(0,0,0)*(256-16)
+        )
+        quantisized_image = image.im.convert("P",0,pal_image.im)
+        image = image._new(quantisized_image)
 
     return image
 
@@ -477,16 +521,36 @@ def image_quantize_paletted_brightness(image):
     for a in range (gradient_colors*3,256*3) :
             my_palettedata.append(0)
 
-    pal_image= PilImage.new("P", (1,1))
-    pal_image.putpalette(my_palettedata)
-    
+    hitherdither_tresholds = [256/user_treshold.get(), 256/user_treshold.get(), 256/user_treshold.get()]
+
+
     #quantisize image to grayscale with given grayscale palette holding (gradient_colors) number of colors
-    quantisized_image = image.im.convert(
-        "P",
-        int(user_effects_dither_floyd_steinberg.get()),              # no dithering
-        pal_image.im
-    )
-    image = image._new(quantisized_image)
+    if (user_dithering.get() == 'bayer') :
+        hitherdither_palette = hitherdither.palette.Palette(convert_to_hitherdither_palette(my_palettedata))
+        image = hitherdither.ordered.bayer.bayer_dithering(image, hitherdither_palette, hitherdither_tresholds, order=hitherdither_order)
+    if (user_dithering.get() == 'yliluomas1') :
+        hitherdither_palette = hitherdither.palette.Palette(convert_to_hitherdither_palette(my_palettedata))
+        image = hitherdither.ordered.yliluoma.yliluomas_1_ordered_dithering(image, hitherdither_palette, order=hitherdither_order)
+    if (user_dithering.get() == 'line') :
+        hitherdither_palette = hitherdither.palette.Palette(convert_to_hitherdither_palette(my_palettedata))
+        image = hitherdither.ordered.bayer.bayer_dithering(image, hitherdither_palette, hitherdither_tresholds, order=hitherdither_order)
+        image = image.resize((80,200))
+        image = image.resize((160,200))
+    if (user_dithering.get() == 'dots') :
+        hitherdither_palette = hitherdither.palette.Palette(convert_to_hitherdither_palette(my_palettedata))
+        image = hitherdither.ordered.cluster.cluster_dot_dithering(image, hitherdither_palette, hitherdither_tresholds, order=hitherdither_order)
+
+    if (user_dithering.get() == 'floyd-steinberg') :
+        pal_image= PilImage.new("P", (1,1))
+        pal_image.putpalette(my_palettedata)
+        quantisized_image = image.im.convert("P",1,pal_image.im)
+        image = image._new(quantisized_image)
+
+    if (user_dithering.get() == 'none') :
+        pal_image= PilImage.new("P", (1,1))
+        pal_image.putpalette(my_palettedata)
+        quantisized_image = image.im.convert("P",0,pal_image.im)
+        image = image._new(quantisized_image)
 
 
 
@@ -1151,7 +1215,7 @@ def action_image_refresh():
     global image_preview
     global image_preview_convert
     global image_koala
-
+    
     #prepare image_preview_convert (this image will be converted later)
     if (user_modes.get() == "palette") :
         #make grayscale
@@ -1334,7 +1398,8 @@ def action_SaveFile():
 
 def action_reset_modifiers():
     global scale_modifier_list
-    for a in scale_modifier_list: a.set(50)
+    for a in range(0,len(scale_modifier_list)):
+        scale_modifier_list[a].set( scale_modifier_list_default[a])
 
 
 
@@ -1367,7 +1432,7 @@ def create_gui_settings_modifiers (
     _row,
     _column
 ) :
-    global scale_modifier_list
+    global scale_modifier_list, scale_modifier_list_default
 
 #scales modifiers
     frame_border = Frame(
@@ -1409,19 +1474,21 @@ def create_gui_settings_modifiers (
 
     MODIFIERS = [
         #text, variable, row, column
-        ("saturation", user_color_saturation, 1,0),
-        ("brightness", user_brightness, 2,0),
-        ("contrast", user_contrast, 3,0),
-        ("sharpness", user_sharpness, 4,0)
+        ("saturation", user_color_saturation, 1,0, 1,100),
+        ("brightness", user_brightness, 2,0, 1,100),
+        ("contrast", user_contrast, 3,0, 1,100),
+        ("sharpness", user_sharpness, 4,0, 1,100),
+        ("dithering treshold", user_treshold, 5,0, 2,20),
     ]
 
     scale_modifier_list=[]
-    for text,var,my_row,my_column in MODIFIERS:
+    scale_modifier_list_default=[]
+    for text, var, my_row, my_column, low, high in MODIFIERS:
         scale_modifier = Scale(
             frame_inner,
             bg=BGCOLOR,
-            from_=1,
-            to=100,
+            from_=low,
+            to=high,
             orient=HORIZONTAL,
             variable=var,
             label=text,
@@ -1435,8 +1502,9 @@ def create_gui_settings_modifiers (
             sticky='w'
         )
         #set default value
-        scale_modifier.set(50)
+        scale_modifier.set(high/2)
         scale_modifier_list.append(scale_modifier)
+        scale_modifier_list_default.append(high/2)
         
 #        last_row = my_row
  
@@ -1500,16 +1568,13 @@ def create_gui_settings_effects (
     )
     EFFECTS = [
         #text, variable, row, column
-        ("dither floyd-steinberg",	user_effects_dither_floyd_steinberg,	1,0),
-        ("dither ordered 1",		user_effects_dither_ordered1, 			2,0),
-        ("dither ordered 2",		user_effects_dither_ordered2, 			3,0),
-        ("blur",					user_effects_blur,						4,0),
-        ("detail",					user_effects_detail, 					5,0),
-        ("enhance",					user_effects_enhance, 					1,1),
-        ("enhance_more",			user_effects_enhance_more, 				2,1),
-        ("smooth",					user_effects_smooth, 					3,1),
-        ("smooth_more",				user_effects_smooth_more,				4,1),
-        ("sharpen",					user_effects_sharpen,					5,1),
+        ("blur",					user_effects_blur,						1,0),
+        ("detail",					user_effects_detail, 					2,0),
+        ("enhance",					user_effects_enhance, 					3,0),
+        ("enhance_more",			user_effects_enhance_more, 				4,0),
+        ("smooth",					user_effects_smooth, 					1,1),
+        ("smooth_more",				user_effects_smooth_more,				2,1),
+        ("sharpen",					user_effects_sharpen,					3,1),
     ]
     for text,var, my_row, my_column in EFFECTS:
         checkbutton_effects = Checkbutton(
@@ -1557,7 +1622,6 @@ def create_gui_settings_outputformat (
     frame_inner.grid_columnconfigure(0, weight=1)
     frame_inner.grid_rowconfigure(0, weight=1)
 
-    _row = 0
     label = Label(
         frame_inner,
         bg=BGCOLOR,
@@ -1568,16 +1632,17 @@ def create_gui_settings_outputformat (
         fg="#000088"
     )
     label.grid(
-        row=_row,
-        column=1,
-        sticky=W+E
+        row=0,
+        column=0,
+        sticky=W+E,
+        columnspan=2
     )
     MODES = [
-            ("koala", "koala"),
-            ("hires", "hires"),
+            ("koala", "koala",1,0),
+            ("hires", "hires",1,1),
     ]
 
-    for text, mode in MODES:
+    for text, mode, row, column in MODES:
         radiobutton_user_mode = Radiobutton(
             frame_inner,
             bg=BGCOLOR,
@@ -1588,10 +1653,9 @@ def create_gui_settings_outputformat (
             cursor=CURSOR_HAND,
             command=action_image_refresh
         )
-        _row += 1
         radiobutton_user_mode.grid(
-            row=_row,
-            column=1,
+            row=row,
+            column=column,
             sticky=W+E
         )
 
@@ -1800,7 +1864,6 @@ def create_gui_palette_brightness_mode (
     frame_inner.grid_columnconfigure(0, weight=1)
     frame_inner.grid_rowconfigure(0, weight=1)
 
-    _row = 0
     label = Label(
         frame_inner,
         bg=BGCOLOR,
@@ -1811,22 +1874,23 @@ def create_gui_palette_brightness_mode (
         fg="#000088"
     )
     label.grid(
-        row=_row,
-        column=1,
-        sticky=W+E
+        row=0,
+        column=0,
+        sticky=W+E,
+        columnspan=4
     )
 
     MODES = [
-            ("purple", "purple"),
-            ("brown", "brown"),
-            ("gray", "gray"),
-            ("green", "green"),
-            ("blue", "blue"),
-            ("green2", "green2"),
-            ("custom", "custom"),
+            ("purple", "purple", 1,0),
+            ("brown", "brown", 2,0),
+            ("gray", "gray", 1,1),
+            ("green", "green", 2,1),
+            ("blue", "blue", 1,2),
+            ("green2", "green2", 2,2),
+            ("custom", "custom", 1,3),
     ]
 
-    for text, mode in MODES:
+    for text, mode, row, column in MODES:
         radiobutton_user_mode = Radiobutton(
             frame_inner,
             bg=BGCOLOR,
@@ -1837,10 +1901,79 @@ def create_gui_palette_brightness_mode (
             command=action_image_refresh,
             cursor=CURSOR_HAND
         )
-        _row += 1
         radiobutton_user_mode.grid(
-            row=_row,
-            column=1,
+            row=row,
+            column=column,
+            sticky=W+E
+        )
+
+
+
+def create_gui_dithering (
+	root,
+    _row,
+    _column
+) :
+    frame_border = Frame(
+        root,
+        bg=BGCOLOR,
+        bd=_bd,
+    )
+    frame_border.grid(
+        row=_row,
+        column=_column
+    )
+    frame_inner = Frame(
+        frame_border,
+        bg=BGCOLOR,
+        bd=1,
+        padx = _padx,
+        pady = _pady,
+        relief=RAISED
+        )
+    frame_inner.grid()
+    frame_inner.grid_columnconfigure(0, weight=1)
+    frame_inner.grid_rowconfigure(0, weight=1)
+
+    label = Label(
+        frame_inner,
+        bg=BGCOLOR,
+        text="dithering",
+        wraplength=100,
+        anchor="c",
+        justify='left',
+        fg="#000088"
+    )
+    label.grid(
+        row=0,
+        column=0,
+        sticky=W+E,
+        columnspan=2
+    )
+
+    MODES = [
+            ("none", "none", 1 ,0),
+            ("floyd-steinberg", "floyd-steinberg", 2 ,0),
+            ("bayer ordered", "bayer", 3 ,0),
+            ("line", "line", 1 ,1),
+            ("dots", "dots", 2 ,1),
+            ("yliluomas1", "yliluomas1", 3 ,1),
+    ]
+
+    for text, mode, row, column in MODES:
+        radiobutton_user_mode = Radiobutton(
+            frame_inner,
+            bg=BGCOLOR,
+            text = text,
+            value = mode,
+            indicatoron=0,
+            variable=user_dithering,
+            command=action_image_refresh,
+            cursor=CURSOR_HAND
+        )
+        radiobutton_user_mode.grid(
+            row=row,
+            column=column,
             sticky=W+E
         )
 
@@ -1875,7 +2008,6 @@ def create_gui_settings_palette (
     frame_inner.grid_columnconfigure(0, weight=1)
     frame_inner.grid_rowconfigure(0, weight=1)
 
-    _row = 0
     label = Label(
         frame_inner,
         bg=BGCOLOR,
@@ -1886,18 +2018,19 @@ def create_gui_settings_palette (
         fg="#000088"
     )
     label.grid(
-        row=_row,
-        column=1,
-        sticky=W+E
+        row=0,
+        column=0,
+        sticky=W+E,
+        columnspan=2
     )
     MODES = [
-            ("colodore", "colodore"),
-            ("pepto", "pepto"),
-            ("view64", "view64"),
-            ("vice", "vice"),
+            ("colodore", "colodore",1,0),
+            ("pepto", "pepto",2,0),
+            ("view64", "view64",1,1),
+            ("vice", "vice",2,1),
         ]
 
-    for text, mode in MODES:
+    for text, mode, row, column in MODES:
         radiobutton_user_mode = Radiobutton(
             frame_inner,
             bg=BGCOLOR,
@@ -1908,10 +2041,9 @@ def create_gui_settings_palette (
             cursor=CURSOR_HAND,
             command=action_image_refresh
         )
-        _row += 1
         radiobutton_user_mode.grid(
-            row=_row,
-            column=1,
+            row=row,
+            column=column,
             sticky=W+E
         )
 
@@ -2272,7 +2404,7 @@ def create_gui_text (
 	)
     textbox = Text(
         frame_inner,
-        height=14,
+        height=10,
         width=40
     )
 
@@ -2590,19 +2722,24 @@ def _main_procedure() :
         2,  #row
         0   #column
     )
-    create_gui_backgroundcolor(
+    create_gui_dithering(
         frame_right,
         3,  #row
         0   #column
     )
-    create_gui_settings_startaddress(
+    create_gui_backgroundcolor(
         frame_right,
         4,  #row
         0   #column
     )
-    create_gui_text(
+    create_gui_settings_startaddress(
         frame_right,
         5,  #row
+        0   #column
+    )
+    create_gui_text(
+        frame_right,
+        6,  #row
         0   #column
     )
 

@@ -56,6 +56,43 @@
 <li>Convert to koala or hires format.</li>
 <li>Save the resulting image.</li>
 </ul>
+<h1 id="dithering">Dithering</h1>
+<p>As of now, Convertron3000 offers various dithering methods. As the PIL-library only implements “floyd-steinberg”-dithering, all other dithering methods were taken from the hitherdither library.</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>reason</th>
+<th>description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>floyd-steinberg dithering</td>
+<td>speedy performance from the PIL-library</td>
+</tr>
+<tr class="even">
+<td>bayer-ordered dithering</td>
+<td>the speedy standard, my favourite for C64 pictures</td>
+</tr>
+<tr class="odd">
+<td>line dithering</td>
+<td>a modified bayer-ordered dithering method, sometimes looks better than normal ordered dithering</td>
+</tr>
+<tr class="even">
+<td>dot dithering</td>
+<td>not my favourite, but might give nice results on some pictures</td>
+</tr>
+<tr class="odd">
+<td>yliluomas1 dithering</td>
+<td>Warning: Painfully slow - use with care! The results are stunningly good sometimes, though.</td>
+</tr>
+</tbody>
+</table>
+<p>Please, take note that all dithering implementations except “floyd-steinberg”-dithering are quite slow when using the “Brightness palette”-mode, which is described below.</p>
 <h1 id="brightness-palette">Brightness palette</h1>
 <p>Sometimes converted images look better when applying a palette based on brightness values.</p>
 <ul>
@@ -90,15 +127,16 @@
 <p>Acknowledgments</p>
 <ul>
 <li>thanks to <a href="http://csdb.dk/scener/?id=20695">Green/ATW</a> for spontaneously naming Convertron3000 :)</li>
-<li>thanks to people on <a href="http://csdb.dk/release/?id=155606">csdb.dk</a> for commenting and giving ideas how to improve # Getting Started</li>
+<li>thanks to people on <a href="http://csdb.dk/release/?id=155606">csdb.dk</a> for commenting and giving ideas how to improve</li>
+<li>thanks to Henrik Blidh for his hitherdither library <a href="https://github.com/hbldh/hitherdither">https://github.com/hbldh/hitherdither</a> which I use # Getting Started</li>
 </ul>
 <p>Convertron3000 comes in two flavors:</p>
 <ul>
-<li>standalone executable for 64-bit systems Linux, MacOS/Darwin and Windows</li>
+<li>standalone executable for 64-bit systems Linux, MacOS/Darwin and Windows (see <a href="https://github.com/fieserWolF/convertron3000/releases">releases</a>)</li>
 <li>Python3 script</li>
 </ul>
 <h2 id="run-the-standalone-executable">Run the standalone executable</h2>
-<p>Just download your bundle and enjoy. Keep in mind that only 64bit systems are supported as I could not find a 32bit system to generate the bundle.</p>
+<p>Just download your bundle at <a href="https://github.com/fieserWolF/convertron3000/releases">releases</a> and enjoy. Keep in mind that only 64bit systems are supported as I could not find a 32bit system to generate the bundle.</p>
 <h3 id="note-for-windows-users">Note for Windows users</h3>
 <p>If some antivirus scanner puts Convertron3000 into quarantine because it suspects a trojan or virus, simply put it out there again. It isn`t harmful, I used PyInstaller to bundle the standalone executable for you. Unfortunately, the PyInstaller bootloader triggers a false alarm on some systems. I even tried my best and re-compiled the PyInstaller bootloader so that this should not happen anymore. Keep your fingers crossed ;)</p>
 <h3 id="note-for-macos-users">Note for MacOS users</h3>
@@ -113,21 +151,28 @@
 <li>python 3</li>
 <li>python tkinter module</li>
 <li>python “The Python Imaging Library” (PIL)</li>
+<li>python “hitherdither” library</li>
 </ul>
 <p>Normally, you would use pip like this:</p>
-<pre><code>pip3 install tk pillow</code></pre>
+<pre><code>pip3 install tk pillow git+https://www.github.com/hbldh/hitherdither</code></pre>
 <p>On my Debian GNU/Linux machine I use apt-get to install everything needed:</p>
 <pre><code>apt-get update
-apt-get install python3 python3-tk python3-pil python3-pil.imagetk</code></pre>
+apt-get install python3 python3-tk python3-pil python3-pil.imagetk
+pip3 install git+https://www.github.com/hbldh/hitherdither</code></pre>
 <h1 id="changelog">Changelog</h1>
 <h2 id="future-plans">Future plans</h2>
 <ul>
-<li>ordered dithering: too high values in ordered dithering modes, slider to control dithering strength</li>
 <li>custom brightness palette editor</li>
 </ul>
 <p>Any help and support in any form is highly appreciated.</p>
 <p>If you have a feature request, a bug report or if you want to offer help, please, contact me:</p>
 <p><a href="http://csdb.dk/scener/?id=3623">http://csdb.dk/scener/?id=3623</a> or <a href="wolf@abyss-connection.de">wolf@abyss-connection.de</a></p>
+<h2 id="changes-in-1.2">Changes in 1.2</h2>
+<ul>
+<li>proper dithering support: bayer-ordered, line dither and some others</li>
+<li>GUI improvements</li>
+<li>moved standalone executables to <a href="https://github.com/fieserWolF/convertron3000/releases">releases</a></li>
+</ul>
 <h2 id="changes-in-1.1">Changes in 1.1</h2>
 <ul>
 <li>transfered whole code to Python3</li>
@@ -158,7 +203,7 @@ apt-get install python3 python3-tk python3-pil python3-pil.imagetk</code></pre>
 </ul>
 <h1 id="license">License</h1>
 <p><em>Convertron3000 is a graphics converter for Commodore 64 computers.</em></p>
-<p><em>Copyright (C) 2021 fieserWolF / Abyss-Connection</em></p>
+<p><em>Copyright (C) 2022 fieserWolF / Abyss-Connection</em></p>
 <p>This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.</p>
 <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.</p>
 <p>You should have received a copy of the GNU General Public License along with this program. If not, see <a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>.</p>
@@ -334,10 +379,10 @@ under certain conditions; type &#39;show c&#39; for details.</code></pre>
 <p>IN NO EVENT SHALL THE AUTHORS OR DISTRIBUTORS BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OF THIS SOFTWARE, ITS DOCUMENTATION, OR ANY DERIVATIVES THEREOF, EVEN IF THE AUTHORS HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</p>
 <p>THE AUTHORS AND DISTRIBUTORS SPECIFICALLY DISCLAIM ANY WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT. THIS SOFTWARE IS PROVIDED ON AN “AS IS” BASIS, AND THE AUTHORS AND DISTRIBUTORS HAVE NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.</p>
 <p>GOVERNMENT USE: If you are acquiring this software on behalf of the U.S. government, the Government shall have only “Restricted Rights” in the software and related documentation as defined in the Federal Acquisition Regulations (FARs) in Clause 52.227.19 (c) (2). If you are acquiring the software on behalf of the Department of Defense, the software shall be classified as “Commercial Computer Software” and the Government shall have only “Restricted Rights” as defined in Clause 252.227-7013 (c) (1) of DFARs. Notwithstanding the foregoing, the authors grant the U.S. Government and others acting in its behalf permission to use and distribute the software in accordance with the terms specified in this license.</p>
-<h1 id="ordered-dithering-sources">Ordered-dithering sources</h1>
-<p><a href="https://github.com/justmao945/lab/tree/master/halftoning/ordered-dithering">https://github.com/justmao945/lab/tree/master/halftoning/ordered-dithering</a> source used</p>
+<h1 id="hitherdither-library">hitherdither-library</h1>
+<p><a href="https://github.com/hbldh/hitherdither">https://github.com/hbldh/hitherdither</a> library used</p>
 <p>The MIT License (MIT)</p>
-<p>Copyright (c) 2014 JianjunMao</p>
+<p>Copyright (c) 2020 Henrik Blidh</p>
 <p>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:</p>
 <p>The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.</p>
 <p>THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
