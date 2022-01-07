@@ -3,6 +3,8 @@
 Convertron3000 is a graphics converter for Commodore 64 computers.
 It runs on 64 bit versions of Linux, MacOS, Windows and other systems supported by Python. 
 
+![screenshot](./screenshot.png)
+
 
 # Why Convertron3000?
 
