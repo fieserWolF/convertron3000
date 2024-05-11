@@ -2,7 +2,7 @@
 
 """
 Convertron3000 Commodore 64 graphics converter
-Copyright (C) 2021 fieserWolF / Abyss-Connection
+Copyright (C) 2024 fieserWolF / Abyss-Connection
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@ import os
 import sys
 import hitherdither
 import struct
-from PIL import ImageTk, ImageEnhance, ImageFilter
+from PIL import ImageTk, ImageEnhance, ImageFilter, ImageDraw
 import PIL.Image as PilImage    #we need another name, as it collides with tkinter.Image otherwise
 from tkinter import *
 from tkinter.filedialog import askopenfilename, asksaveasfilename
@@ -245,7 +245,7 @@ CURSOR_HAND = 'hand2'
 
 
 
-
+"""
 ERROR_DIFFUSION = (
     'Floyd-Steinberg',
     'Jarvis-Judice-Ninke',
@@ -257,7 +257,7 @@ ERROR_DIFFUSION = (
     'Stevenson-Arce',
     'Atkinson'
 )
-
+"""
 
 
 #global variables
@@ -289,6 +289,7 @@ user_effects_enhance_more = IntVar()
 user_effects_smooth = IntVar()
 user_effects_smooth_more = IntVar()
 user_effects_sharpen = IntVar()
+user_effects_showClashes = IntVar()
 
 user_gradient_sceme = StringVar()
 user_dithering = StringVar()
@@ -303,7 +304,8 @@ user_palette.set("pepto")
 user_gradient_sceme.set("purple")
 user_filename_open_textvariable.set("none")
 convertbutton_text.set("convert\nAlt+C")
-user_dithering.set("bayer")
+user_dithering.set("none")
+#user_dithering.set("bayer")
 
 
 textbox = Text()
@@ -312,7 +314,7 @@ label_preview_image = Label()
 label_koala_image = Label()
 image_original = PilImage.new("RGB", (320, 200), "black")
 image_preview = PilImage.new("RGB", (320, 200), "black")
-image_koala = PilImage.new("RGB", (320, 200), "black")
+image_koala = PilImage.new("RGBA", (320, 200), "black")
 image_preview_convert = PilImage.new("RGB", (160, 200), "black")
 
 koala_bitmap=[None]*8000
@@ -325,7 +327,6 @@ hires_colorindex_data = [0] * HIRES_WIDTH*HIRES_HEIGHT
 
 #initialize empty 320x200 data
 image_result_koala = PilImage.new("P", (KOALA_WIDTH, KOALA_HEIGHT))
-
 image_result_hires = PilImage.new("P", (HIRES_WIDTH, HIRES_HEIGHT))
 
 scale_modifier_list=[]
@@ -334,6 +335,7 @@ scale_modifier_list_default=[]
 user_custom_gradient_sceme = [0] * 16
 user_custom_gradient_sceme_size = 0
 
+color_clash_chars_xy = []
 
 
 #hitherdither
@@ -455,9 +457,9 @@ def image_quantize_c64_colors(image):
         image = hitherdither.ordered.yliluoma.yliluomas_1_ordered_dithering(image, hitherdither_palette, order=hitherdither_order)
     if (user_dithering.get() == 'line') :
         hitherdither_palette = hitherdither.palette.Palette(convert_to_hitherdither_palette(my_palettedata))
-        image = image.resize((320,200))
+        image = image.resize((320,200), resample=PilImage.NEAREST)
         image = hitherdither.ordered.bayer.bayer_dithering(image, hitherdither_palette, hitherdither_tresholds, order=hitherdither_order)
-        image = image.resize((160,200))
+        image = image.resize((160,200), resample=PilImage.NEAREST)
     if (user_dithering.get() == 'dots') :
         hitherdither_palette = hitherdither.palette.Palette(convert_to_hitherdither_palette(my_palettedata))
         image = hitherdither.ordered.cluster.cluster_dot_dithering(image, hitherdither_palette, hitherdither_tresholds, order=hitherdither_order)
@@ -534,8 +536,8 @@ def image_quantize_paletted_brightness(image):
     if (user_dithering.get() == 'line') :
         hitherdither_palette = hitherdither.palette.Palette(convert_to_hitherdither_palette(my_palettedata))
         image = hitherdither.ordered.bayer.bayer_dithering(image, hitherdither_palette, hitherdither_tresholds, order=hitherdither_order)
-        image = image.resize((80,200))
-        image = image.resize((160,200))
+        image = image.resize((80,200), resample=PilImage.NEAREST)
+        image = image.resize((160,200), resample=PilImage.NEAREST)
     if (user_dithering.get() == 'dots') :
         hitherdither_palette = hitherdither.palette.Palette(convert_to_hitherdither_palette(my_palettedata))
         image = hitherdither.ordered.cluster.cluster_dot_dithering(image, hitherdither_palette, hitherdither_tresholds, order=hitherdither_order)
@@ -752,15 +754,13 @@ def convert_to_koala_replace_colors(
     
 def convert_to_koala_sort_palette(
     palette
-):
-    #normal bubble sort
+):    
+    #normal bubble sort, sort colors: mostly used first, least used last
     for a in range(0,16):
         for b in range(0,16):
             if (a==b) : continue
-            #if (palette[a,1] > palette[b,1]):
             if (palette[a][1] > palette[b][1]):
                 palette[b], palette[a] = palette[a].copy(), palette[b].copy() 
-    return palette
 
 
 
@@ -787,6 +787,34 @@ def convert_to_koala_find_best_background_color(
     return my_palette[0][0] #color
     
 
+def show_color_clashes_on_console(
+    my_data
+) :
+    if ( len(my_data) > 0 ) :
+        n=1
+        print('Color clashes:')
+        for c in my_data :
+            print('%3d: '%(n),end='')
+            print('x:%2d, y:%2d, %d colors used, colors: ' %(c[0], c[1], c[2]), end='')
+            for r in c[3] :
+                print('%2d, '%r , end='')
+            print()
+            n+=1
+        print('---end---')
+
+        """
+        unique_list = [list(x) for x in set(tuple(x) for x in color_clash_chars_xy)]
+        color_clash_chars_xy = unique_list
+        n=1
+        print('unique list (should not contain duplicates):')
+        for c in color_clash_chars_xy :
+            print('%d: '%(n),end='')
+            print(c)
+            n+=1
+        print('---end---')
+        """
+
+
 
 
 def convert_to_koala(
@@ -799,6 +827,7 @@ def convert_to_koala(
     """
     global textbox
     global koala_bitmap, koala_col12, koala_col3, koala_bg
+    global color_clash_chars_xy
     
     textbox.delete('1.0', END)      #clear textbox
 
@@ -823,8 +852,6 @@ def convert_to_koala(
             bmp_bitmap[y][x] = my_list[(y*160)+x]
 
 
-
-
     #converting to koala: begin...
     color_clash_counter = 0
     color_clash_chars_counter = 0
@@ -838,7 +865,10 @@ def convert_to_koala(
         background_color = convert_to_koala_find_best_background_color(bmp_bitmap);
     textbox.insert(END,"Background Color = %d\n" % background_color)
 
+
+
     #main loop
+    color_clash_chars_xy = []
     for y in range (0,25):
         for x in range (0,40):
 
@@ -857,22 +887,34 @@ def convert_to_koala(
             # fill palette amount values
             for c in range (0,8):
                 for d in range (0,4):
-                    palette[block[c][d]][1] += 1 # palette.amount
+                    palette[block[c][d]][1] += 1 # increase the color-counter (palette.amount) for block[c][d]
             
             palette[background_color][1] = 99   # palette.amount BACKGROUND_COLOR always has to be in the palette
             convert_to_koala_sort_palette(palette)
-
-
-
+#            print("sorted:")
+#            print(palette)
+            
             used_colors_count = 0
+            used_colors_colors = []
             for c in range (0,16):
                 if (palette[c][1] > 0): #palette[c].amount
                     used_colors_count += 1  #this color has already been used (amount > 0)
+                    used_colors_colors.append(palette[c][0])    #store color number of used color
 
             if (used_colors_count > 4) :    #this character has more than 4 colors -> fix this color clash
                 color_clash_chars_counter += 1
+                my_coords = []
+                my_coords.append(x)
+                my_coords.append(y)
+                my_coords.append(used_colors_count)
+                my_coords.append(used_colors_colors)
+                color_clash_chars_xy.append(my_coords)
+                #print("x: %d, y: %d"%(x,y))
+                #print(palette)
+                #print("")
 
-                for c in range (4,16):  #
+
+                for c in range (4,16):  #find a solution for fourth, fifth, sixth... color if it is used
                     if (palette[c][1]>0):   #palette[c].amount
                         color_clash_counter += 1
                         solution = convert_to_koala_find_replace_color(palette, palette[c][0])    #palette.color
@@ -917,6 +959,10 @@ def convert_to_koala(
                 bitmap[y][x][c] = (bitmap[y][x][c] << 2) | block[c][3]
 
     textbox.insert(END,'Fixed %d color clashes in %d character blocks.\n'% (color_clash_counter, color_clash_chars_counter));
+
+    show_color_clashes_on_console(color_clash_chars_xy)
+    
+
 
     #convert to our format used in koala_to_image
     for y in range (0,25) :
@@ -996,7 +1042,8 @@ def convert_to_hires(
     """
     global textbox
     global koala_bitmap, koala_col12
-    
+    global color_clash_chars_xy
+
     textbox.delete('1.0', END)      #clear textbox
 
     block = [ [0] * 8 for i in range(8)]    #8*8 = 64 bytes
@@ -1023,6 +1070,7 @@ def convert_to_hires(
     #converting to hires: begin...
     color_clash_counter = 0
     color_clash_chars_counter = 0
+    color_clash_chars_xy = []
 
     #main loop
     for y in range (0,25):
@@ -1048,12 +1096,20 @@ def convert_to_hires(
 
 
             used_colors_count = 0
+            used_colors_colors = []
             for c in range (0,16):
                 if (palette[c][1] > 0): #palette[c].amount
                     used_colors_count += 1  #this color has already been used (amount > 0)
+                    used_colors_colors.append(palette[c][0])    #store color number of used color
 
             if (used_colors_count > 2) :    #this character has more than 2 colors -> fix this color clash
                 color_clash_chars_counter += 1
+                my_coords = []
+                my_coords.append(x)
+                my_coords.append(y)
+                my_coords.append(used_colors_count)
+                my_coords.append(used_colors_colors)
+                color_clash_chars_xy.append(my_coords)
 
                 for c in range (2,16):  #color[0] and color[1] of the palette are used mostly, keep them. replace the others (2..15)
                     if (palette[c][1]>0):   #palette[c].amount
@@ -1097,7 +1153,11 @@ def convert_to_hires(
                 bitmap[y][x][c] = (bitmap[y][x][c] << 1) | block[c][6]
                 bitmap[y][x][c] = (bitmap[y][x][c] << 1) | block[c][7]
 
-    textbox.insert(END,'Fixed %d color clashes in %d character blocks.\n'% (color_clash_counter, color_clash_chars_counter));
+    textbox.insert(END,'Fixed %d color clashes in %d character blocks. See console for details.\n'% (color_clash_counter, color_clash_chars_counter));
+
+    show_color_clashes_on_console(color_clash_chars_xy)
+
+
 
     #convert to our format used in hires_to_image
     for y in range (0,25) :
@@ -1161,15 +1221,10 @@ def image_preview_create_effects(
 
 
 
-def action_image_refresh_prepare():
-        global koala_image
-
-
-
 
 
 def action_convert():
-    global koala_image
+    global image_koala
 
     convertbutton_text.set("busy...")
 
@@ -1190,7 +1245,7 @@ def action_convert():
         image_result_koala.putpalette(my_palettedata)
         image_result_koala.putdata(koala_colorindex_data)
 
-        image_koala = image_result_koala.resize((320,200)).convert("RGB")
+        image_koala = image_result_koala.resize((320,200), resample=PilImage.NEAREST).convert("RGBA")
        
         
     if (user_outputformat.get()=='hires') :
@@ -1199,14 +1254,39 @@ def action_convert():
 
         image_result_hires.putpalette(my_palettedata)
         image_result_hires.putdata(hires_colorindex_data)
-        image_koala = image_result_hires.convert("RGB")
+        image_koala = image_result_hires.convert("RGBA")
 
-    image_koalaTk = ImageTk.PhotoImage(image_koala)
+    image_koala_new = show_color_clashes()
+    image_koalaTk = ImageTk.PhotoImage(image_koala_new)
     label_koala_image.configure(image=image_koalaTk)
     label_koala_image.image = image_koalaTk # keep a reference!
 
+
+#    image_koalaTk = ImageTk.PhotoImage(image_koala)
+#    label_koala_image.configure(image=image_koalaTk)
+#    label_koala_image.image = image_koalaTk # keep a reference!
+
     convertbutton_text.set("convert\nAlt+C")
 
+
+def show_color_clashes():
+    image_markers = PilImage.new("RGBA", (320,200), (0,0,0,0))
+    img1 = ImageDraw.Draw(image_markers)
+    for i in color_clash_chars_xy:
+        img1.rectangle(
+            [
+                (i[0]*8, i[1]*8),           # start: x,y
+                (i[0]+1)*8, (i[1]+1)*8      # end: x,y
+            ],
+            fill=(255,255,0,128),
+            outline=(255,0,0,128)
+        )
+    
+    image_koala_new = image_koala
+    if (user_effects_showClashes.get() == 1) :
+        image_koala_new = PilImage.alpha_composite(image_koala, image_markers)
+        
+    return image_koala_new
 
 
 
@@ -1223,21 +1303,24 @@ def action_image_refresh():
         image_grayscale = enhancer.enhance(0)
         image_preview_convert = image_preview_create_effects(image_grayscale)   #apply effects
         if (user_outputformat.get() == "koala") :
-            image_preview_convert = image_preview_convert.resize((160,200))
+            image_preview_convert = image_preview_convert.resize((160,200), resample=PilImage.NEAREST)
         image_preview_convert = image_quantize_paletted_brightness(image_preview_convert)   #quantisize to selected gradient
         image_preview_convert = image_preview_convert.convert("RGB")
         image_preview_convert = image_quantize_c64_colors(image_preview_convert)    #map to 16 colors using normal c64 palette
     else:
         image_preview_convert = image_preview_create_effects(image_original)
         if (user_outputformat.get() == "koala") :
-            image_preview_convert = image_preview_convert.resize((160,200))
+            image_preview_convert = image_preview_convert.resize((160,200), resample=PilImage.NEAREST)
+            image_preview_convert.save('/tmp/1.png')
         image_preview_convert = image_quantize_c64_colors(image_preview_convert)
 
     #prepare image_preview (this image will only be seen in preview window)
     if (user_outputformat.get() == "koala") :
-        image_preview = image_preview_convert.resize((320,200))
+        image_preview = image_preview_convert.resize((320,200), resample=PilImage.NEAREST)
     if (user_outputformat.get() == "hires") :
         image_preview = image_preview_convert
+        
+    #image_preview = image_preview.convert("RGBA")
         
     image_previewTk = ImageTk.PhotoImage(image_preview)
     label_preview_image.configure(image=image_previewTk)
@@ -1245,6 +1328,16 @@ def action_image_refresh():
 
     #converting every time the image is refreshed: takes a lot of time and cpu power
     #action_convert()
+
+    image_koala_new = show_color_clashes()
+    image_koalaTk = ImageTk.PhotoImage(image_koala_new)
+    label_koala_image.configure(image=image_koalaTk)
+    label_koala_image.image = image_koalaTk # keep a reference!
+
+
+
+
+
 	
 	
 
@@ -1284,7 +1377,7 @@ def load_image(
 	global image_originalTk
 #	print("opening image \"%s\"..."%filename)
 	image_original = PilImage.open(filename)
-	image_original = image_original.resize((320,200))
+	image_original = image_original.resize((320,200), resample=PilImage.NEAREST)
 	image_original = image_original.convert("RGB")
 	image_originalTk = ImageTk.PhotoImage(image_original)
 	label_original_image.configure(image=image_originalTk)
@@ -1460,7 +1553,7 @@ def create_gui_settings_modifiers (
     label = Label(
         frame_inner,
         bg=BGCOLOR,
-        text="color modifiers",
+        text="modifiers",
         wraplength=100,
         anchor='c',
         justify='left',
@@ -1554,7 +1647,7 @@ def create_gui_settings_effects (
     label = Label(
         frame_inner,
         bg=BGCOLOR,
-        text="effects",
+        text="options",
         wraplength=100,
         anchor='c',
         justify='left',
@@ -1575,6 +1668,8 @@ def create_gui_settings_effects (
         ("smooth",					user_effects_smooth, 					1,1),
         ("smooth_more",				user_effects_smooth_more,				2,1),
         ("sharpen",					user_effects_sharpen,					3,1),
+        ("show clashes",			user_effects_showClashes,				4,1),
+ 
     ]
     for text,var, my_row, my_column in EFFECTS:
         checkbutton_effects = Checkbutton(

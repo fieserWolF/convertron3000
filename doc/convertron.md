@@ -22,6 +22,7 @@ Using Convertron3000 is pretty straight-forward:
 * Open some image.
 * Adjust the sliders or apply an effect.
 * Convert to koala or hires format.
+* optional: Check position of color-clashes.
 * Save the resulting image.
 
 
@@ -138,8 +139,8 @@ pip3 install tk pillow git+https://www.github.com/hbldh/hitherdither
 
 On my Debian GNU/Linux machine I use apt-get to install everything needed:
 ```
-apt-get update
-apt-get install python3 python3-tk python3-pil python3-pil.imagetk
+apt update
+apt install python3 python3-tk python3-pil python3-pil.imagetk
 pip3 install git+https://www.github.com/hbldh/hitherdither
 ```
 
@@ -158,6 +159,12 @@ If you have a feature request, a bug report or if you want to offer help, please
 [http://csdb.dk/scener/?id=3623](http://csdb.dk/scener/?id=3623)
 or
 [wolf@abyss-connection.de](wolf@abyss-connection.de)
+
+
+## Changes in 1.3 (on X2024)
+
+- fixed: proper scaling, better conversion
+- show position of color clashes in GUI and on console
 
 
 ## Changes in 1.2
@@ -203,7 +210,7 @@ or
 
 _Convertron3000 is a graphics converter for Commodore 64 computers._
 
-_Copyright (C) 2022 fieserWolF / Abyss-Connection_
+_Copyright (C) 2024 fieserWolF / Abyss-Connection_
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 

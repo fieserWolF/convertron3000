@@ -5,6 +5,11 @@ Convertron3000 is a graphics converter for Commodore 64 computers. It
 runs on 64 bit versions of Linux, MacOS, Windows and other systems
 supported by Python.
 
+.. figure:: ./screenshot.png
+   :alt: screenshot
+
+   screenshot
+
 Why Convertron3000?
 ===================
 
@@ -32,6 +37,7 @@ Using Convertron3000 is pretty straight-forward:
 -  Open some image.
 -  Adjust the sliders or apply an effect.
 -  Convert to koala or hires format.
+-  optional: Check position of color-clashes.
 -  Save the resulting image.
 
 Dithering
@@ -132,6 +138,12 @@ help, please, contact me:
 http://csdb.dk/scener/?id=3623 or
 `wolf@abyss-connection.de <wolf@abyss-connection.de>`__
 
+Changes in 1.3 (on X2024)
+-------------------------
+
+-  fixed: proper scaling, better conversion
+-  show position of color clashes in GUI and on console
+
 Changes in 1.2
 --------------
 
@@ -179,7 +191,7 @@ License
 
 *Convertron3000 is a graphics converter for Commodore 64 computers.*
 
-*Copyright (C) 2022 fieserWolF / Abyss-Connection*
+*Copyright (C) 2024 fieserWolF / Abyss-Connection*
 
 This program is free software: you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the
