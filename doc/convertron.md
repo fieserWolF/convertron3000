@@ -161,6 +161,11 @@ or
 [wolf@abyss-connection.de](wolf@abyss-connection.de)
 
 
+## Changes in 1.31
+
+- fixed: wrong hires image dimensions when using line dithering
+
+
 ## Changes in 1.3 (on X2024)
 
 - fixed: proper scaling, better conversion

@@ -457,9 +457,10 @@ def image_quantize_c64_colors(image):
         image = hitherdither.ordered.yliluoma.yliluomas_1_ordered_dithering(image, hitherdither_palette, order=hitherdither_order)
     if (user_dithering.get() == 'line') :
         hitherdither_palette = hitherdither.palette.Palette(convert_to_hitherdither_palette(my_palettedata))
-        image = image.resize((320,200), resample=PilImage.NEAREST)
+        my_width, my_height = image.size
+        image = image.resize((my_width*2,my_height), resample=PilImage.NEAREST)
         image = hitherdither.ordered.bayer.bayer_dithering(image, hitherdither_palette, hitherdither_tresholds, order=hitherdither_order)
-        image = image.resize((160,200), resample=PilImage.NEAREST)
+        image = image.resize((my_width,my_height), resample=PilImage.NEAREST)
     if (user_dithering.get() == 'dots') :
         hitherdither_palette = hitherdither.palette.Palette(convert_to_hitherdither_palette(my_palettedata))
         image = hitherdither.ordered.cluster.cluster_dot_dithering(image, hitherdither_palette, hitherdither_tresholds, order=hitherdither_order)
@@ -535,9 +536,10 @@ def image_quantize_paletted_brightness(image):
         image = hitherdither.ordered.yliluoma.yliluomas_1_ordered_dithering(image, hitherdither_palette, order=hitherdither_order)
     if (user_dithering.get() == 'line') :
         hitherdither_palette = hitherdither.palette.Palette(convert_to_hitherdither_palette(my_palettedata))
+        my_width, my_height = image.size
+        image = image.resize((my_width*2,my_height), resample=PilImage.NEAREST)
         image = hitherdither.ordered.bayer.bayer_dithering(image, hitherdither_palette, hitherdither_tresholds, order=hitherdither_order)
-        image = image.resize((80,200), resample=PilImage.NEAREST)
-        image = image.resize((160,200), resample=PilImage.NEAREST)
+        image = image.resize((my_width,my_height), resample=PilImage.NEAREST)
     if (user_dithering.get() == 'dots') :
         hitherdither_palette = hitherdither.palette.Palette(convert_to_hitherdither_palette(my_palettedata))
         image = hitherdither.ordered.cluster.cluster_dot_dithering(image, hitherdither_palette, hitherdither_tresholds, order=hitherdither_order)

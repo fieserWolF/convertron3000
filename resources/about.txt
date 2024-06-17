@@ -138,6 +138,11 @@ help, please, contact me:
 http://csdb.dk/scener/?id=3623 or
 `wolf@abyss-connection.de <wolf@abyss-connection.de>`__
 
+Changes in 1.31
+---------------
+
+-  fixed: wrong hires image dimensions when using line dithering
+
 Changes in 1.3 (on X2024)
 -------------------------
 
