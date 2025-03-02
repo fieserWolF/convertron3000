@@ -28,6 +28,10 @@ Why Convertron3000?
 |                                   | sliders and see the result before |
 |                                   | converting                        |
 +-----------------------------------+-----------------------------------+
+| deal with color clashes           | visualize color clashes instantly |
+|                                   | or read out their position from   |
+|                                   | an optional json-file             |
++-----------------------------------+-----------------------------------+
 
 Usage
 =====
@@ -39,6 +43,26 @@ Using Convertron3000 is pretty straight-forward:
 -  Convert to koala or hires format.
 -  optional: Check position of color-clashes.
 -  Save the resulting image.
+
+Commandline options
+===================
+
+::
+
+   CONVERTRON3000 v1.32 [build 250302-122436] *** by fieserWolF
+   usage: convertron.py [-h] [-i INPUT_IMAGE] [-c FILE_CLASHES] [-d]
+
+   This program reads an image-file, lets the user adjust settings and converts it to a C64 koala or hires image.
+
+   options:
+     -h, --help            show this help message and exit
+     -i, --image INPUT_IMAGE
+                           image file)
+     -c, --clashes FILE_CLASHES
+                           filename of report containing all color-clashes (in json-format, default="/tmp/color_clashes.json")
+     -d, --debug           show color-clashes on consule
+
+   Example: ./convertron.py -i image.png -c /tmp/clashes.json -d
 
 Dithering
 =========
@@ -138,6 +162,14 @@ help, please, contact me:
 http://csdb.dk/scener/?id=3623 or
 `wolf@abyss-connection.de <wolf@abyss-connection.de>`__
 
+Changes in 1.32
+---------------
+
+-  added proper commandline argument parsing (try “convertron.py –help”)
+-  added json output of color clashes (can be read from other tools to
+   work on color clashes)
+-  fixed: removed leftover saving debug image “/tmp/1.png”
+
 Changes in 1.31
 ---------------
 
@@ -196,7 +228,7 @@ License
 
 *Convertron3000 is a graphics converter for Commodore 64 computers.*
 
-*Copyright (C) 2024 fieserWolF / Abyss-Connection*
+*Copyright (C) 2025 fieserWolF / Abyss-Connection*
 
 This program is free software: you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the
@@ -1061,3 +1093,29 @@ IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
 CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+argparse
+========
+
+https://github.com/bewest/argparse library used
+
+argparse is (c) 2006-2009 Steven J. Bethard steven.bethard@gmail.com.
+
+The argparse module was contributed to Python as of Python 2.7 and thus
+was licensed under the Python license. Same license applies to all files
+in the argparse package project.
+
+For details about the Python License, please see doc/Python-License.txt.
+
+History
+-------
+
+Before (and including) argparse 1.1, the argparse package was licensed
+under Apache License v2.0.
+
+After argparse 1.1, all project files from the argparse project were
+deleted due to license compatibility issues between Apache License 2.0
+and GNU GPL v2.
+
+The project repository then had a clean start with some files taken from
+Python 2.7.1, so definitely all files are under Python License now.

@@ -36,6 +36,10 @@ import PIL.Image as PilImage    #we need another name, as it collides with tkint
 from tkinter import *
 from tkinter.filedialog import askopenfilename, asksaveasfilename
 import json
+import argparse
+
+#from tkinter import ttk
+#ttk.Style().theme_use('clam')
 
 
 #global constants
@@ -49,6 +53,8 @@ BGCOLOR="#d9d9d9"
 PROGNAME = 'CONVERTRON3000';
 C64_CHAR_HEIGHT=25  #200/8
 C64_CHAR_WIDTH=40   #320/8
+
+FILENAME_JSON_PRE = '/tmp/color_clashes.json'
 
 def resource_path(relative_path):
     """ Get absolute path to resource, works for dev and for PyInstaller """
@@ -336,6 +342,8 @@ user_custom_gradient_sceme = [0] * 16
 user_custom_gradient_sceme_size = 0
 
 color_clash_chars_xy = []
+
+args = 0
 
 
 #hitherdither
@@ -787,7 +795,58 @@ def convert_to_koala_find_best_background_color(
     convert_to_koala_sort_palette(my_palette)
         
     return my_palette[0][0] #color
+
+
+
+def write_color_clashes_to_json_file(
+    filename_out,
+    my_data
+) :
     
+    if ( len(my_data) > 0 ) :
+        # write file
+        print ('    Opening json-file "%s" for writing...' % filename_out, end='')
+        try:
+            file_out = open(filename_out , "w")
+        except IOError as err:
+            print("I/O error: {0}".format(err))
+            sys.exit(1)
+
+        json_data = {}
+
+        #info
+        my_item = {}
+        my_item['program'] = PROGNAME
+        my_item['version'] = VERSION
+        my_item['clashes amount'] = len(my_data)
+        json_data['info'] = my_item
+
+
+        #Color clashes
+        clash_array = []
+        number = 0
+        for c in my_data :
+            #posx
+            my_item = {}
+            my_item['number'] = number
+            my_item['x'] = c[0]
+            my_item['y'] = c[1]
+            my_item['colors used'] = c[2]
+            used_colors = []
+            for r in c[3] :
+                used_colors.append(r)
+            my_item['colors'] = used_colors
+            clash_array.append( my_item )
+            number += 1
+        json_data['clashes'] = clash_array
+
+        #write to file
+        json.dump(json_data, file_out, indent=4)
+        file_out.close()
+        print("done.")
+
+    return None
+
 
 def show_color_clashes_on_console(
     my_data
@@ -960,10 +1019,11 @@ def convert_to_koala(
                 bitmap[y][x][c] = (bitmap[y][x][c] << 2) | block[c][2]
                 bitmap[y][x][c] = (bitmap[y][x][c] << 2) | block[c][3]
 
-    textbox.insert(END,'Fixed %d color clashes in %d character blocks.\n'% (color_clash_counter, color_clash_chars_counter));
+    textbox.insert(END,'Fixed %d color clashes in %d character blocks. See file "%s" for details.\n'% (color_clash_counter, color_clash_chars_counter, args.file_clashes));
 
-    show_color_clashes_on_console(color_clash_chars_xy)
-    
+    if (args.debug_clashes) :
+        show_color_clashes_on_console(color_clash_chars_xy)
+    write_color_clashes_to_json_file(args.file_clashes,color_clash_chars_xy)
 
 
     #convert to our format used in koala_to_image
@@ -1155,10 +1215,11 @@ def convert_to_hires(
                 bitmap[y][x][c] = (bitmap[y][x][c] << 1) | block[c][6]
                 bitmap[y][x][c] = (bitmap[y][x][c] << 1) | block[c][7]
 
-    textbox.insert(END,'Fixed %d color clashes in %d character blocks. See console for details.\n'% (color_clash_counter, color_clash_chars_counter));
+    textbox.insert(END,'Fixed %d color clashes in %d character blocks. See file "%s" for details.\n'% (color_clash_counter, color_clash_chars_counter, args.file_clashes));
 
-    show_color_clashes_on_console(color_clash_chars_xy)
-
+    if (args.debug_clashes) :
+        show_color_clashes_on_console(color_clash_chars_xy)
+    write_color_clashes_to_json_file(args.file_clashes,color_clash_chars_xy)
 
 
     #convert to our format used in hires_to_image
@@ -1313,7 +1374,6 @@ def action_image_refresh():
         image_preview_convert = image_preview_create_effects(image_original)
         if (user_outputformat.get() == "koala") :
             image_preview_convert = image_preview_convert.resize((160,200), resample=PilImage.NEAREST)
-            image_preview_convert.save('/tmp/1.png')
         image_preview_convert = image_quantize_c64_colors(image_preview_convert)
 
     #prepare image_preview (this image will only be seen in preview window)
@@ -2706,7 +2766,28 @@ def keyboard_OpenGradient(self):
 
 
 def _main_procedure() :
-            
+    global args
+    print("%s %s *** by fieserWolF"% (PROGNAME, VERSION))
+
+    #https://docs.python.org/3/library/argparse.html
+    parser = argparse.ArgumentParser(
+        description='This program reads an image-file, lets the user adjust settings and converts it to a C64 koala or hires image.',
+        epilog='Example: '+sys.argv[0]+' -i image.png -c /tmp/clashes.json -d'
+    )
+    parser.add_argument('-i', '--image', dest='input_image', help='image file)')
+    parser.add_argument('-c', '--clashes', dest='file_clashes', help='filename of report containing all color-clashes (in json-format, default="'+FILENAME_JSON_PRE+'")', default=FILENAME_JSON_PRE)
+    parser.add_argument('-d', '--debug', dest='debug_clashes', help='show color-clashes on consule', action='store_true')
+    args = parser.parse_args()
+
+    _start_gui()
+
+    if (args.input_image) :
+        loadFile(args.input_image)
+
+    mainloop()
+
+    
+def _start_gui() :
     #main procedure
     title_string = PROGNAME+" "+VERSION
     root.title(title_string)
@@ -2851,11 +2932,6 @@ def _main_procedure() :
 
     create_empty_images()
     
-    if (len(sys.argv) > 1) :
-        loadFile(sys.argv[1])
-
-
-    mainloop()
     
 
 

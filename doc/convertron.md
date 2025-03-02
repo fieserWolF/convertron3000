@@ -13,6 +13,7 @@ reason | description
 open source | easy to modify and to improve, any useful contribution is highly welcome
 portable | available on Linux, MacOS, Windows and any other system supported by Python3
 instant preview | just fiddle around with the sliders and see the result before converting
+deal with color clashes | visualize color clashes instantly or read out their position from an optional json-file
 
 
 # Usage
@@ -24,6 +25,23 @@ Using Convertron3000 is pretty straight-forward:
 * Convert to koala or hires format.
 * optional: Check position of color-clashes.
 * Save the resulting image.
+
+
+# Commandline options
+    CONVERTRON3000 v1.32 [build 250302-122436] *** by fieserWolF
+    usage: convertron.py [-h] [-i INPUT_IMAGE] [-c FILE_CLASHES] [-d]
+
+    This program reads an image-file, lets the user adjust settings and converts it to a C64 koala or hires image.
+
+    options:
+      -h, --help            show this help message and exit
+      -i, --image INPUT_IMAGE
+                            image file)
+      -c, --clashes FILE_CLASHES
+                            filename of report containing all color-clashes (in json-format, default="/tmp/color_clashes.json")
+      -d, --debug           show color-clashes on consule
+
+    Example: ./convertron.py -i image.png -c /tmp/clashes.json -d
 
 
 # Dithering
@@ -129,12 +147,13 @@ At least this is needed to run the script directly:
 - python 3
 - python tkinter module
 - python "The Python Imaging Library" (PIL)
+- python "argparse" library
 - python "hitherdither" library
 
 
 Normally, you would use pip like this:
 ```
-pip3 install tk pillow git+https://www.github.com/hbldh/hitherdither
+pip3 install tk pillow argparse git+https://www.github.com/hbldh/hitherdither
 ```
 
 On my Debian GNU/Linux machine I use apt-get to install everything needed:
@@ -159,6 +178,13 @@ If you have a feature request, a bug report or if you want to offer help, please
 [http://csdb.dk/scener/?id=3623](http://csdb.dk/scener/?id=3623)
 or
 [wolf@abyss-connection.de](wolf@abyss-connection.de)
+
+
+## Changes in 1.32
+
+- added proper commandline argument parsing (try "convertron.py --help")
+- added json output of color clashes (can be read from other tools to work on color clashes)
+- fixed: removed leftover saving debug image "/tmp/1.png"
 
 
 ## Changes in 1.31
@@ -215,7 +241,7 @@ or
 
 _Convertron3000 is a graphics converter for Commodore 64 computers._
 
-_Copyright (C) 2024 fieserWolF / Abyss-Connection_
+_Copyright (C) 2025 fieserWolF / Abyss-Connection_
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 

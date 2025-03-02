@@ -64,6 +64,11 @@ Python3</td>
 <td>just fiddle around with the sliders and see the result before
 converting</td>
 </tr>
+<tr class="even">
+<td>deal with color clashes</td>
+<td>visualize color clashes instantly or read out their position from an
+optional json-file</td>
+</tr>
 </tbody>
 </table>
 <h1 id="usage">Usage</h1>
@@ -75,6 +80,21 @@ converting</td>
 <li>optional: Check position of color-clashes.</li>
 <li>Save the resulting image.</li>
 </ul>
+<h1 id="commandline-options">Commandline options</h1>
+<pre><code>CONVERTRON3000 v1.32 [build 250302-122436] *** by fieserWolF
+usage: convertron.py [-h] [-i INPUT_IMAGE] [-c FILE_CLASHES] [-d]
+
+This program reads an image-file, lets the user adjust settings and converts it to a C64 koala or hires image.
+
+options:
+  -h, --help            show this help message and exit
+  -i, --image INPUT_IMAGE
+                        image file)
+  -c, --clashes FILE_CLASHES
+                        filename of report containing all color-clashes (in json-format, default=&quot;/tmp/color_clashes.json&quot;)
+  -d, --debug           show color-clashes on consule
+
+Example: ./convertron.py -i image.png -c /tmp/clashes.json -d</code></pre>
 <h1 id="dithering">Dithering</h1>
 <p>As of now, Convertron3000 offers various dithering methods. As the
 PIL-library only implements “floyd-steinberg”-dithering, all other
@@ -205,10 +225,11 @@ directory into the same folder on your computer.</p>
 <li>python 3</li>
 <li>python tkinter module</li>
 <li>python “The Python Imaging Library” (PIL)</li>
+<li>python “argparse” library</li>
 <li>python “hitherdither” library</li>
 </ul>
 <p>Normally, you would use pip like this:</p>
-<pre><code>pip3 install tk pillow git+https://www.github.com/hbldh/hitherdither</code></pre>
+<pre><code>pip3 install tk pillow argparse git+https://www.github.com/hbldh/hitherdither</code></pre>
 <p>On my Debian GNU/Linux machine I use apt-get to install everything
 needed:</p>
 <pre><code>apt update
@@ -225,6 +246,14 @@ help, please, contact me:</p>
 <p><a
 href="http://csdb.dk/scener/?id=3623">http://csdb.dk/scener/?id=3623</a>
 or <a href="wolf@abyss-connection.de">wolf@abyss-connection.de</a></p>
+<h2 id="changes-in-1.32">Changes in 1.32</h2>
+<ul>
+<li>added proper commandline argument parsing (try “convertron.py
+–help”)</li>
+<li>added json output of color clashes (can be read from other tools to
+work on color clashes)</li>
+<li>fixed: removed leftover saving debug image “/tmp/1.png”</li>
+</ul>
 <h2 id="changes-in-1.31">Changes in 1.31</h2>
 <ul>
 <li>fixed: wrong hires image dimensions when using line dithering</li>
@@ -275,7 +304,7 @@ Windows</li>
 <h1 id="license">License</h1>
 <p><em>Convertron3000 is a graphics converter for Commodore 64
 computers.</em></p>
-<p><em>Copyright (C) 2024 fieserWolF / Abyss-Connection</em></p>
+<p><em>Copyright (C) 2025 fieserWolF / Abyss-Connection</em></p>
 <p>This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the
 Free Software Foundation, either version 3 of the License, or (at your
@@ -1004,5 +1033,26 @@ IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
 CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
+<h1 id="argparse">argparse</h1>
+<p><a
+href="https://github.com/bewest/argparse">https://github.com/bewest/argparse</a>
+library used</p>
+<p>argparse is (c) 2006-2009 Steven J. Bethard <a
+href="mailto:steven.bethard@gmail.com"
+class="email">steven.bethard@gmail.com</a>.</p>
+<p>The argparse module was contributed to Python as of Python 2.7 and
+thus was licensed under the Python license. Same license applies to all
+files in the argparse package project.</p>
+<p>For details about the Python License, please see
+doc/Python-License.txt.</p>
+<h2 id="history">History</h2>
+<p>Before (and including) argparse 1.1, the argparse package was
+licensed under Apache License v2.0.</p>
+<p>After argparse 1.1, all project files from the argparse project were
+deleted due to license compatibility issues between Apache License 2.0
+and GNU GPL v2.</p>
+<p>The project repository then had a clean start with some files taken
+from Python 2.7.1, so definitely all files are under Python License
+now.</p>
 </body>
 </html>
