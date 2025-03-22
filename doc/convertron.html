@@ -81,18 +81,22 @@ optional json-file</td>
 <li>Save the resulting image.</li>
 </ul>
 <h1 id="commandline-options">Commandline options</h1>
-<p>CONVERTRON3000 v1.33 [build 250322-030736] *** by fieserWolF usage:
-convertron.py [-h] [-i INPUT_IMAGE] [-c CLASHES_JSON] [-o CLASHES_IMAGE]
-[-d]</p>
-<p>This program reads an image-file, lets the user adjust settings and
-converts it to a C64 koala or hires image.</p>
-<p>options: -h, –help show this help message and exit -i, –image
-INPUT_IMAGE image file) -c, –clashes CLASHES_JSON filename of report
-containing all color-clashes (in json-format
-(default=“/tmp/color_clashes.json”) -o, –output CLASHES_IMAGE filename
-of color-clash image (default=“/tmp/color_clashes.png”) -d, –debug show
-color-clashes on consule</p>
-<p>Example: ./convertron.py -i image.png -c /tmp/clashes.json -d</p>
+<pre><code>CONVERTRON3000 v1.33 [build 250322-030736] *** by fieserWolF
+usage: convertron.py [-h] [-i INPUT_IMAGE] [-c CLASHES_JSON] [-o CLASHES_IMAGE] [-d]
+
+This program reads an image-file, lets the user adjust settings and converts it to a C64 koala or hires image.
+
+options:
+  -h, --help            show this help message and exit
+  -i, --image INPUT_IMAGE
+                        image file)
+  -c, --clashes CLASHES_JSON
+                        filename of report containing all color-clashes (in json-format (default=&quot;/tmp/color_clashes.json&quot;)
+  -o, --output CLASHES_IMAGE
+                        filename of color-clash image (default=&quot;/tmp/color_clashes.png&quot;)
+  -d, --debug           show color-clashes on consule
+
+Example: ./convertron.py -i image.png -c /tmp/clashes.json -d</code></pre>
 <h1 id="dithering">Dithering</h1>
 <p>As of now, Convertron3000 offers various dithering methods. As the
 PIL-library only implements “floyd-steinberg”-dithering, all other
