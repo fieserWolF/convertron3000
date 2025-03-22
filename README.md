@@ -180,6 +180,12 @@ or
 [wolf@abyss-connection.de](wolf@abyss-connection.de)
 
 
+## Changes in 1.33
+
+- added: image with color-clashes is saved
+- bug fixes
+
+
 ## Changes in 1.32
 
 - added proper commandline argument parsing (try "convertron.py --help")

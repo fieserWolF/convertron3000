@@ -55,6 +55,7 @@ C64_CHAR_HEIGHT=25  #200/8
 C64_CHAR_WIDTH=40   #320/8
 
 FILENAME_JSON_PRE = '/tmp/color_clashes.json'
+FILENAME_CLASH_IMAGE_PRE = '/tmp/color_clashes.png'
 
 def resource_path(relative_path):
     """ Get absolute path to resource, works for dev and for PyInstaller """
@@ -1019,11 +1020,11 @@ def convert_to_koala(
                 bitmap[y][x][c] = (bitmap[y][x][c] << 2) | block[c][2]
                 bitmap[y][x][c] = (bitmap[y][x][c] << 2) | block[c][3]
 
-    textbox.insert(END,'Fixed %d color clashes in %d character blocks. See file "%s" for details.\n'% (color_clash_counter, color_clash_chars_counter, args.file_clashes));
+    textbox.insert(END,'Fixed %d color clashes in %d character blocks. See file "%s" for details.\n'% (color_clash_counter, color_clash_chars_counter, args.clashes_json));
 
     if (args.debug_clashes) :
         show_color_clashes_on_console(color_clash_chars_xy)
-    write_color_clashes_to_json_file(args.file_clashes,color_clash_chars_xy)
+    write_color_clashes_to_json_file(args.clashes_json,color_clash_chars_xy)
 
 
     #convert to our format used in koala_to_image
@@ -1219,7 +1220,7 @@ def convert_to_hires(
 
     if (args.debug_clashes) :
         show_color_clashes_on_console(color_clash_chars_xy)
-    write_color_clashes_to_json_file(args.file_clashes,color_clash_chars_xy)
+    write_color_clashes_to_json_file(args.clashes_json,color_clash_chars_xy)
 
 
     #convert to our format used in hires_to_image
@@ -1333,6 +1334,7 @@ def action_convert():
 
 
 def show_color_clashes():
+    if (len(color_clash_chars_xy) == 0): return image_koala
     image_markers = PilImage.new("RGBA", (320,200), (0,0,0,0))
     img1 = ImageDraw.Draw(image_markers)
     for i in color_clash_chars_xy:
@@ -1348,6 +1350,9 @@ def show_color_clashes():
     image_koala_new = image_koala
     if (user_effects_showClashes.get() == 1) :
         image_koala_new = PilImage.alpha_composite(image_koala, image_markers)
+
+        print ('    Opening image-file "%s" for writing...' % args.clashes_image)
+        image_koala_new.save(args.clashes_image)
         
     return image_koala_new
 
@@ -2775,7 +2780,8 @@ def _main_procedure() :
         epilog='Example: '+sys.argv[0]+' -i image.png -c /tmp/clashes.json -d'
     )
     parser.add_argument('-i', '--image', dest='input_image', help='image file)')
-    parser.add_argument('-c', '--clashes', dest='file_clashes', help='filename of report containing all color-clashes (in json-format, default="'+FILENAME_JSON_PRE+'")', default=FILENAME_JSON_PRE)
+    parser.add_argument('-c', '--clashes', dest='clashes_json', help='filename of report containing all color-clashes (in json-format (default="'+FILENAME_JSON_PRE+'")', default=FILENAME_JSON_PRE)
+    parser.add_argument('-o', '--output', dest='clashes_image', help='filename of color-clash image (default="'+FILENAME_CLASH_IMAGE_PRE+'")', default=FILENAME_CLASH_IMAGE_PRE)
     parser.add_argument('-d', '--debug', dest='debug_clashes', help='show color-clashes on consule', action='store_true')
     args = parser.parse_args()
 

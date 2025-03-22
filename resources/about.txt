@@ -162,6 +162,12 @@ help, please, contact me:
 http://csdb.dk/scener/?id=3623 or
 `wolf@abyss-connection.de <wolf@abyss-connection.de>`__
 
+Changes in 1.33
+---------------
+
+-  added: image with color-clashes is saved
+-  bug fixes
+
 Changes in 1.32
 ---------------
 
