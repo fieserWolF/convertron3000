@@ -28,20 +28,23 @@ Using Convertron3000 is pretty straight-forward:
 
 
 # Commandline options
-    CONVERTRON3000 v1.32 [build 250302-122436] *** by fieserWolF
-    usage: convertron.py [-h] [-i INPUT_IMAGE] [-c FILE_CLASHES] [-d]
+CONVERTRON3000 v1.33 [build 250322-030736] *** by fieserWolF
+usage: convertron.py [-h] [-i INPUT_IMAGE] [-c CLASHES_JSON] [-o CLASHES_IMAGE] [-d]
 
-    This program reads an image-file, lets the user adjust settings and converts it to a C64 koala or hires image.
+This program reads an image-file, lets the user adjust settings and converts it to a C64 koala or hires image.
 
-    options:
-      -h, --help            show this help message and exit
-      -i, --image INPUT_IMAGE
-                            image file)
-      -c, --clashes FILE_CLASHES
-                            filename of report containing all color-clashes (in json-format, default="/tmp/color_clashes.json")
-      -d, --debug           show color-clashes on consule
+options:
+  -h, --help            show this help message and exit
+  -i, --image INPUT_IMAGE
+                        image file)
+  -c, --clashes CLASHES_JSON
+                        filename of report containing all color-clashes (in json-format (default="/tmp/color_clashes.json")
+  -o, --output CLASHES_IMAGE
+                        filename of color-clash image (default="/tmp/color_clashes.png")
+  -d, --debug           show color-clashes on consule
 
-    Example: ./convertron.py -i image.png -c /tmp/clashes.json -d
+Example: ./convertron.py -i image.png -c /tmp/clashes.json -d
+
 
 
 # Dithering
