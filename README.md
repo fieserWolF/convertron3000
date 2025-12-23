@@ -184,9 +184,10 @@ or
 [wolf@abyss-connection.de](wolf@abyss-connection.de)
 
 
+
 ## Changes in 1.33
 
-- added: image with color-clashes is saved
+- added: color-clashes can be saved as image and as json
 - bug fixes
 
 

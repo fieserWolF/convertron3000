@@ -275,6 +275,8 @@ root = Tk()
 
 user_filename_open = "none"
 user_filename_save = "none"
+user_filename_save_clash_json = "none"
+user_filename_save_clash_image = "none"
 
 user_start_address = StringVar()
 user_start_address_checkbutton = IntVar()
@@ -335,6 +337,11 @@ hires_colorindex_data = [0] * HIRES_WIDTH*HIRES_HEIGHT
 #initialize empty 320x200 data
 image_result_koala = PilImage.new("P", (KOALA_WIDTH, KOALA_HEIGHT))
 image_result_hires = PilImage.new("P", (HIRES_WIDTH, HIRES_HEIGHT))
+
+image_clashes = PilImage.new("P", (KOALA_WIDTH, KOALA_HEIGHT))
+#image_clashes_koala = PilImage.new("P", (KOALA_WIDTH, KOALA_HEIGHT))
+#image_clashes_hires = PilImage.new("P", (HIRES_WIDTH, HIRES_HEIGHT))
+
 
 scale_modifier_list=[]
 scale_modifier_list_default=[]
@@ -1020,11 +1027,10 @@ def convert_to_koala(
                 bitmap[y][x][c] = (bitmap[y][x][c] << 2) | block[c][2]
                 bitmap[y][x][c] = (bitmap[y][x][c] << 2) | block[c][3]
 
-    textbox.insert(END,'Fixed %d color clashes in %d character blocks. See file "%s" for details.\n'% (color_clash_counter, color_clash_chars_counter, args.clashes_json));
+    textbox.insert(END,'Fixed %d color clashes in %d character blocks.\n'% (color_clash_counter, color_clash_chars_counter));
 
     if (args.debug_clashes) :
         show_color_clashes_on_console(color_clash_chars_xy)
-    write_color_clashes_to_json_file(args.clashes_json,color_clash_chars_xy)
 
 
     #convert to our format used in koala_to_image
@@ -1216,11 +1222,10 @@ def convert_to_hires(
                 bitmap[y][x][c] = (bitmap[y][x][c] << 1) | block[c][6]
                 bitmap[y][x][c] = (bitmap[y][x][c] << 1) | block[c][7]
 
-    textbox.insert(END,'Fixed %d color clashes in %d character blocks. See file "%s" for details.\n'% (color_clash_counter, color_clash_chars_counter, args.file_clashes));
+    textbox.insert(END,'Fixed %d color clashes in %d character blocks.\n'% (color_clash_counter, color_clash_chars_counter));
 
     if (args.debug_clashes) :
         show_color_clashes_on_console(color_clash_chars_xy)
-    write_color_clashes_to_json_file(args.clashes_json,color_clash_chars_xy)
 
 
     #convert to our format used in hires_to_image
@@ -1334,6 +1339,7 @@ def action_convert():
 
 
 def show_color_clashes():
+    global image_clashes
     if (len(color_clash_chars_xy) == 0): return image_koala
     image_markers = PilImage.new("RGBA", (320,200), (0,0,0,0))
     img1 = ImageDraw.Draw(image_markers)
@@ -1350,10 +1356,14 @@ def show_color_clashes():
     image_koala_new = image_koala
     if (user_effects_showClashes.get() == 1) :
         image_koala_new = PilImage.alpha_composite(image_koala, image_markers)
-
-        print ('    Opening image-file "%s" for writing...' % args.clashes_image)
-        image_koala_new.save(args.clashes_image)
         
+        image_clashes = image_koala_new
+
+        #print ('    Opening image-file "%s" for writing...' % args.clashes_image)
+        #image_koala_new.save(args.clashes_image)
+        #write_color_clashes_to_json_file(args.clashes_json,color_clash_chars_xy)
+        #textbox.insert(END,'See files "%s" and "%s" for details.\n'% (args.clashes_json, args.clashes_image));
+
     return image_koala_new
 
 
@@ -1556,6 +1566,41 @@ def action_SaveFile():
 
 
 
+def action_SaveFile_clash_json():
+    global user_filename_save_clash_json
+    #user_filename_save_clash_json = args.clashes_json
+
+    global textbox
+    textbox.delete('1.0', END)      #clear textbox
+
+    user_filename_save_clash_json = asksaveasfilename(filetypes = [('json', '*.json')])
+
+    if not user_filename_save_clash_json : return None
+
+    #write_color_clashes_to_json_file(args.clashes_json,color_clash_chars_xy)
+    write_color_clashes_to_json_file(user_filename_save_clash_json,color_clash_chars_xy)
+
+
+
+def action_SaveFile_clash_image():
+    global user_filename_save_clash_image
+    user_filename_save_clash_image = ""
+
+    global textbox
+    textbox.delete('1.0', END)      #clear textbox
+
+    user_filename_save_clash_image = asksaveasfilename(filetypes = [('image', '*.png')])
+
+    if not user_filename_save_clash_image : return None
+
+    image_clashes.save(user_filename_save_clash_image)
+    
+    return None
+
+
+
+
+
 def action_reset_modifiers():
     global scale_modifier_list
     for a in range(0,len(scale_modifier_list)):
@@ -1571,8 +1616,11 @@ def create_drop_down_menu (
 
     filemenu = Menu(menu)
 
-    filemenu.add_command(label="open...", command=action_OpenFile, underline=0, accelerator="Alt+O")
-    filemenu.add_command(label="save...", command=action_SaveFile, underline=0, accelerator="Alt+S")
+    filemenu.add_command(label="open image...", command=action_OpenFile, underline=0, accelerator="Alt+O")
+    filemenu.add_command(label="save image...", command=action_SaveFile, underline=0, accelerator="Alt+S")
+    filemenu.add_separator()
+    filemenu.add_command(label="save color-clash image...", command=action_SaveFile_clash_image, underline=5, accelerator="Alt+C")
+    filemenu.add_command(label="save color-clash json...", command=action_SaveFile_clash_json, underline=17, accelerator="Alt+J")
     filemenu.add_separator()
     filemenu.add_command(label="open custom gradient...", command=action_OpenGradient, underline=5, accelerator="Alt+G")
 #    filemenu.add_command(label="save custom gradient...", command=action_SaveGradient, underline=5, accelerator="Alt+H")
@@ -2780,8 +2828,8 @@ def _main_procedure() :
         epilog='Example: '+sys.argv[0]+' -i image.png -c /tmp/clashes.json -d'
     )
     parser.add_argument('-i', '--image', dest='input_image', help='image file)')
-    parser.add_argument('-c', '--clashes', dest='clashes_json', help='filename of report containing all color-clashes (in json-format (default="'+FILENAME_JSON_PRE+'")', default=FILENAME_JSON_PRE)
-    parser.add_argument('-o', '--output', dest='clashes_image', help='filename of color-clash image (default="'+FILENAME_CLASH_IMAGE_PRE+'")', default=FILENAME_CLASH_IMAGE_PRE)
+    #parser.add_argument('-c', '--clashes', dest='clashes_json', help='filename of report containing all color-clashes (in json-format (default="'+FILENAME_JSON_PRE+'")', default=FILENAME_JSON_PRE)
+    #parser.add_argument('-o', '--output', dest='clashes_image', help='filename of color-clash image (default="'+FILENAME_CLASH_IMAGE_PRE+'")', default=FILENAME_CLASH_IMAGE_PRE)
     parser.add_argument('-d', '--debug', dest='debug_clashes', help='show color-clashes on consule', action='store_true')
     args = parser.parse_args()
 

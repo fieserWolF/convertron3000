@@ -167,7 +167,7 @@ http://csdb.dk/scener/?id=3623 or
 Changes in 1.33
 ---------------
 
--  added: image with color-clashes is saved
+-  added: color-clashes can be saved as image and as json
 -  bug fixes
 
 Changes in 1.32
