@@ -2,8 +2,7 @@ Convertron3000
 ==============
 
 Convertron3000 is a graphics converter for Commodore 64 computers. It
-runs on 64 bit versions of Linux, MacOS, Windows and other systems
-supported by Python.
+runs on Linux, MacOS, Windows and other systems supported by Python.
 
 .. figure:: ./screenshot.png
    :alt: screenshot
@@ -33,8 +32,24 @@ Why Convertron3000?
 |                                   | an optional json-file             |
 +-----------------------------------+-----------------------------------+
 
+Author
+======
+
+-  fieserWolF/Abyss-Connection - *initial work* -
+   https://github.com/fieserWolF https://csdb.dk/scener/?id=3623
+
+Acknowledgments
+===============
+
+-  thanks to `Green/ATW <http://csdb.dk/scener/?id=20695>`__ for
+   spontaneously naming Convertron3000 :)
+-  thanks to people on `csdb.dk <http://csdb.dk/release/?id=155606>`__
+   for commenting and giving ideas how to improve
+-  thanks to Henrik Blidh for his hitherdither library
+   https://github.com/hbldh/hitherdither which I use # Using PetPet
+
 Usage
-=====
+-----
 
 Using Convertron3000 is pretty straight-forward:
 
@@ -44,30 +59,8 @@ Using Convertron3000 is pretty straight-forward:
 -  optional: Check position of color-clashes.
 -  Save the resulting image.
 
-Commandline options
-===================
-
-::
-
-   CONVERTRON3000 v1.33 [build 250322-030736] *** by fieserWolF
-   usage: convertron.py [-h] [-i INPUT_IMAGE] [-c CLASHES_JSON] [-o CLASHES_IMAGE] [-d]
-
-   This program reads an image-file, lets the user adjust settings and converts it to a C64 koala or hires image.
-
-   options:
-     -h, --help            show this help message and exit
-     -i, --image INPUT_IMAGE
-                           image file)
-     -c, --clashes CLASHES_JSON
-                           filename of report containing all color-clashes (in json-format (default="/tmp/color_clashes.json")
-     -o, --output CLASHES_IMAGE
-                           filename of color-clash image (default="/tmp/color_clashes.png")
-     -d, --debug           show color-clashes on consule
-
-   Example: ./convertron.py -i image.png -c /tmp/clashes.json -d
-
 Dithering
-=========
+---------
 
 As of now, Convertron3000 offers various dithering methods. As the
 PIL-library only implements “floyd-steinberg”-dithering, all other
@@ -101,7 +94,7 @@ Please, take note that all dithering implementations except
 palette”-mode, which is described below.
 
 Brightness palette
-==================
+------------------
 
 Sometimes converted images look better when applying a palette based on
 brightness values.
@@ -118,7 +111,7 @@ You can also create your own palette like this:
 -  Choose “custom” as your brightness palette.
 
 File Formats
-============
+------------
 
 The multicolor bitmap is stored in the widely-spread KoalaPainter (.koa)
 format:
@@ -136,20 +129,102 @@ The hires bitmap is stored in the widely-spread Advanced Art Studio
 -  8000 bytes raw bitmap data
 -  1000 bytes raw “Video Matrix” (screen) data
 
-Authors
-=======
+Commandline options
+===================
 
--  fieserWolF/Abyss-Connection - *initial work* -
-   https://github.com/fieserWolF https://csdb.dk/scener/?id=3623
+::
 
-Acknowledgments
+   CONVERTRON3000 v1.33 [build 250322-030736] *** by fieserWolF
+   usage: convertron.py [-h] [-i INPUT_IMAGE] [-c CLASHES_JSON] [-o CLASHES_IMAGE] [-d]
 
--  thanks to `Green/ATW <http://csdb.dk/scener/?id=20695>`__ for
-   spontaneously naming Convertron3000 :)
--  thanks to people on `csdb.dk <http://csdb.dk/release/?id=155606>`__
-   for commenting and giving ideas how to improve
--  thanks to Henrik Blidh for his hitherdither library
-   https://github.com/hbldh/hitherdither which I use # Changelog
+   This program reads an image-file, lets the user adjust settings and converts it to a C64 koala or hires image.
+
+   options:
+     -h, --help            show this help message and exit
+     -i, --image INPUT_IMAGE
+                           image file)
+     -c, --clashes CLASHES_JSON
+                           filename of report containing all color-clashes (in json-format (default="/tmp/color_clashes.json")
+     -o, --output CLASHES_IMAGE
+                           filename of color-clash image (default="/tmp/color_clashes.png")
+     -d, --debug           show color-clashes on consule
+
+   Example: ./convertron.py -i image.png -c /tmp/clashes.json -d
+
+Getting Started
+===============
+
+Convertron3000 comes in two flavors:
+
+-  standalone executable for 64-bit systems Linux, MacOS/Darwin and
+   Windows (see
+   `releases <https://github.com/fieserWolF/convertron3000/releases>`__)
+-  Python3 script
+
+Run the standalone executable
+-----------------------------
+
+Just download your bundle at
+`releases <https://github.com/fieserWolF/convertron3000/releases>`__ and
+enjoy. Keep in mind that only 64bit systems are supported as I could not
+find a 32bit system to generate the bundle.
+
+Note for Windows users
+~~~~~~~~~~~~~~~~~~~~~~
+
+If some antivirus scanner puts Convertron3000 into quarantine because it
+suspects a trojan or virus, simply put it out there again. It isn`t
+harmful, I used PyInstaller to bundle the standalone executable for you.
+Unfortunately, the PyInstaller bootloader triggers a false alarm on some
+systems. I even tried my best and re-compiled the PyInstaller bootloader
+so that this should not happen anymore. Keep your fingers crossed ;)
+
+Note for MacOS users
+~~~~~~~~~~~~~~~~~~~~
+
+Your system might complain that the code is not signed by a certificated
+developer. Well, I am not, so I signed the program on my own.
+
+::
+
+   "Convertron3000" can`t be opened because it is from an unidentified developer.
+
+You need to right-click or Control-click the app and select “Open”.
+
+Run the Python3 script directly
+-------------------------------
+
+Download *convertron.py* and the whole *resource* - directory into the
+same folder on your computer.
+
+Prerequisites
+~~~~~~~~~~~~~
+
+At least this is needed to run the script directly:
+
+-  python 3
+-  python tkinter module
+-  python “The Python Imaging Library” (PIL)
+-  python “argparse” library
+-  python “hitherdither” library
+
+Normally, you would use pip like this:
+
+::
+
+   pip3 install tk pillow argparse git+https://www.github.com/hbldh/hitherdither
+
+On my Debian GNU/Linux machine I use apt-get to install everything
+needed:
+
+::
+
+   apt update
+   apt install python3 python3-tk python3-pil python3-pil.imagetk
+   pip3 install git+https://www.github.com/hbldh/hitherdither
+
+Changelog
+=========
 
 Future plans
 ------------
@@ -163,6 +238,18 @@ help, please, contact me:
 
 http://csdb.dk/scener/?id=3623 or
 `wolf@abyss-connection.de <wolf@abyss-connection.de>`__
+
+Changes in 1.34
+---------------
+
+(next release candidate)
+
+-  rearranged the main layout to simplify the workflow (all controls are
+   closer by now)
+-  rearranged the documentation
+-  bug fix: proper file-not-found handling when opening images
+-  bug fix: fixed crash when not finding reasonable color replacement in
+   hires mode (thanks slesinger for the bug report)
 
 Changes in 1.33
 ---------------

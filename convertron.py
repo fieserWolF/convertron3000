@@ -66,6 +66,7 @@ RES_VERSION = resource_path('resources/version.txt')
 RES_GFX_ICON = resource_path('resources/icon.png')
 RES_GFX_ABOUT = resource_path('resources/about.png')
 RES_DOC_ABOUT = resource_path('resources/about.txt')
+RES_DOC_HELP = resource_path('resources/help.txt')
 
 VERSION = open(RES_VERSION, encoding="utf_8").read().rstrip()
 
@@ -736,19 +737,17 @@ def convert_to_koala_find_replace_color(
 #                print('solution found: %d -> %d' %(replace_this, palette[b][0]))
 
     if (found == False) :
-        print( 'Error in the color replacement table: ')
+        print('ERROR in the color replacement table for color %d: '%replace_this)
+        print('Replacement table for color %d: '% replace_this, end='')
+        print(REPLACEMENT_TABLE[replace_this])
 
-        print( '4 mostly used colors: ')
-        #for a in range (0,4) : print ("%d " % palette[a].color),
-        for a in range (0,4) : print ("%d " % palette[a][0]),
-        print
+        print( '4 mostly used colors in the whole image: ',end='')
+        for a in range (0,4) : print ("%d" % palette[a][0],end=', ')
+        print ()
 
-        print ( 'Replacement table for color %d: '% replace_this)
-        print( REPLACEMENT_TABLE[replace_this] )
-        print
-
-        return_value = palette[1][0];
-        print('Dirty fix: Replacing %d with most used color %d.' % (replace_this,palette[1][0]));
+        return_value = palette[0][0];
+        print('Dirty fix: Replacing color %d with most used color %d.' % (replace_this,return_value));
+        print()
 
     return return_value
 
@@ -1067,16 +1066,17 @@ def convert_to_hires_find_replace_color(
     if (found == False) :
         print( 'Error in the color replacement table: ')
 
-        print( '2 mostly used colors: ')
-        for a in range (0,2) : print ("%d " % palette[a].color),
-        print
+        print('ERROR in the color replacement table for color %d: '%replace_this)
+        print('Replacement table for color %d: '% replace_this, end='')
+        print(REPLACEMENT_TABLE[replace_this])
 
-        print ( 'Replacement table for color %d: '% replace_this)
-        for a in range (0,16) : print( "%d " % REPLACEMENT_TABLE[replace_this][a]),
-        print
+        print( '2 mostly used colors in the whole image: ',end='')
+        for a in range (0,2) : print ("%d" % palette[a][0],end=', ')
+        print ()
 
-        return_value = palette[1][0];
-        print('Dirty fix: Replacing %d with most used color %d.' % (replace_this,palette[1][0]));
+        return_value = palette[0][0];
+        print('Dirty fix: Replacing color %d with most used color %d.' % (replace_this,return_value));
+        print()
 
     return return_value
 
@@ -1449,17 +1449,22 @@ def create_empty_images():
 def load_image(
 	filename
 ):
-	global label_original_image
-	global image_original
-	global image_originalTk
-#	print("opening image \"%s\"..."%filename)
-	image_original = PilImage.open(filename)
-	image_original = image_original.resize((320,200), resample=PilImage.NEAREST)
-	image_original = image_original.convert("RGB")
-	image_originalTk = ImageTk.PhotoImage(image_original)
-	label_original_image.configure(image=image_originalTk)
-	label_original_image.image = image_original # keep a reference!
-	action_image_refresh()
+    global label_original_image
+    global image_original
+    global image_originalTk
+#   print("opening image \"%s\"..."%filename)
+    try:
+        image_original = PilImage.open(filename)
+    except FileNotFoundError as err:
+        print("FileNotFoundError: {0}".format(err))
+        sys.exit(1)
+
+    image_original = image_original.resize((320,200), resample=PilImage.NEAREST)
+    image_original = image_original.convert("RGB")
+    image_originalTk = ImageTk.PhotoImage(image_original)
+    label_original_image.configure(image=image_originalTk)
+    label_original_image.image = image_original # keep a reference!
+    action_image_refresh()
 
 
 
@@ -1615,6 +1620,7 @@ def create_drop_down_menu (
     root.config(menu=menu)
 
     filemenu = Menu(menu)
+    infomenu = Menu(menu)
 
     filemenu.add_command(label="open image...", command=action_OpenFile, underline=0, accelerator="Alt+O")
     filemenu.add_command(label="save image...", command=action_SaveFile, underline=0, accelerator="Alt+S")
@@ -1625,12 +1631,15 @@ def create_drop_down_menu (
     filemenu.add_command(label="open custom gradient...", command=action_OpenGradient, underline=5, accelerator="Alt+G")
 #    filemenu.add_command(label="save custom gradient...", command=action_SaveGradient, underline=5, accelerator="Alt+H")
     filemenu.add_separator()
-    filemenu.add_command(label="about...", command=create_gui_about, underline=0, accelerator="Alt+A")
-    filemenu.add_separator()
     filemenu.add_command(label="quit", command=root.quit, underline=0, accelerator="Alt+Q")
 
+    infomenu.add_command(label="help", command=create_gui_help, underline=0, accelerator="f1")
+    infomenu.add_command(label="about", command=create_gui_about)
+
     #add all menus
-    menu.add_cascade(label="menu", menu=filemenu)
+    menu.add_cascade(label="menu", menu=filemenu, underline=0, accelerator="Alt+m")
+    menu.add_cascade(label="info", menu=infomenu, underline=0, accelerator="Alt+i")
+
 
 
 
@@ -1971,7 +1980,7 @@ def create_gui_backgroundcolor (
     label = Label(
         frame_inner,
         bg=BGCOLOR,
-        text="convert background $d021",
+        text="background color ($d021)",
         anchor="c",
         justify='left',
         fg="#000088"
@@ -2528,6 +2537,136 @@ def create_gui_about (
 
 
 
+
+def create_gui_help (
+) :
+    TEXT_HEIGHT=30
+
+    def close_window():
+        global help_window
+        global help_window_open
+        
+        if (help_window_open == True) :
+            help_window.destroy()
+            help_window_open = False
+
+    def close_window_key(self):
+        close_window()
+
+    def keyboard_up(event):
+        msg.yview_scroll(-1,"units")
+
+    def keyboard_down(event):
+        msg.yview_scroll(1,"units")
+
+    def keyboard_pageup(event):
+        msg.yview_scroll(TEXT_HEIGHT,"units")
+
+    def keyboard_pagedown(event):
+        msg.yview_scroll(TEXT_HEIGHT*-1,"units")
+
+
+    _padx = 10
+    _pady = 10
+    
+	#http://effbot.org/tkinterbook/toplevel.htm
+    help_window = Toplevel(
+        bd=10
+    )
+    help_window.title("Help")
+    help_window.configure(background=BGCOLOR)
+
+    frame_left = Frame( help_window)
+    frame_right = Frame( help_window)
+
+    #http://effbot.org/tkinterbook/message.htm
+    #text
+    msg = Text(
+        frame_right,
+#        bd=10,
+        relief=FLAT,
+        width=80,
+        height=30
+    )
+
+    #scrollbar
+    msg_scrollBar = Scrollbar(
+        frame_right,
+        bg=BGCOLOR
+    )
+    msg_scrollBar.config(command=msg.yview)
+    msg.insert(END, open(RES_DOC_HELP, encoding="utf_8").read())
+    msg.config(yscrollcommand=msg_scrollBar.set)
+    msg.config(state=DISABLED)
+
+    #label with image
+    #http://effbot.org/tkinterbook/photoimage.htm
+    #image = Image.open("wolf.jpg")
+    #photo = ImageTk.PhotoImage(image)
+    photo = PhotoImage(file=RES_GFX_ABOUT)
+    label_image = Label(
+        frame_left,
+        bg=BGCOLOR,
+#        bd=10,
+        image=photo,
+        padx=_padx,
+        pady=_pady
+    )
+    label_image.image = photo # keep a reference!
+
+    #button
+    button = Button(
+        frame_left,
+        bg=BGCOLOR,
+        text="OK",
+        command=help_window.destroy,
+        padx=_padx,
+        pady=_pady
+    )
+
+
+    #placement in grid
+    frame_left.grid(
+        row=0,
+        column=0,
+        sticky=W
+    )
+    frame_right.grid(
+        row=0,
+        column=1,
+        sticky=W
+    )
+    
+    label_image.grid(
+        row=0,
+        column=0,
+        sticky=W
+    )
+    button.grid(
+        row=1,
+        column=0,
+        sticky=W+E
+    )
+
+    msg.grid(
+        row=0,
+        column=0,
+        sticky=W
+    )
+    msg_scrollBar.grid(
+        row=0,
+        column=1,
+        sticky=N+S
+    )
+
+    help_window.bind('<Up>', keyboard_up) 
+    help_window.bind('<Down>', keyboard_down) 
+    help_window.bind('<Next>', keyboard_pageup) 
+    help_window.bind('<Prior>', keyboard_pagedown) 
+
+
+
+
 	
 
 def create_gui_action_buttons (
@@ -2918,60 +3057,60 @@ def _start_gui() :
     )
 
 
-
-
-    #frame_middle elements
-    create_gui_image_koala(
-        frame_middle,
-        0,  #row
-        0   #column
-    )
-    create_gui_image_preview(
-        frame_middle,
-        1,  #row
-        0   #column
-    )
-    create_gui_image_original(
-        frame_middle,
-        2,  #row
-        0   #column
-    )
-
-
     #frame_right elements
     create_gui_filename(
-        frame_right,
+        frame_middle,
         0,  #row
         0   #column
     )
     create_gui_settings_mode(
-        frame_right,
+        frame_middle,
         1,  #row
         0   #column
     )
     create_gui_palette_brightness_mode(
-        frame_right,
+        frame_middle,
         2,  #row
         0   #column
     )
     create_gui_dithering(
-        frame_right,
+        frame_middle,
         3,  #row
         0   #column
     )
     create_gui_backgroundcolor(
-        frame_right,
+        frame_middle,
         4,  #row
         0   #column
     )
     create_gui_settings_startaddress(
-        frame_right,
+        frame_middle,
         5,  #row
         0   #column
     )
     create_gui_text(
-        frame_right,
+        frame_middle,
         6,  #row
+        0   #column
+    )
+
+
+
+
+    #frame_middle elements
+    create_gui_image_koala(
+        frame_right,
+        0,  #row
+        0   #column
+    )
+    create_gui_image_preview(
+        frame_right,
+        1,  #row
+        0   #column
+    )
+    create_gui_image_original(
+        frame_right,
+        2,  #row
         0   #column
     )
 
