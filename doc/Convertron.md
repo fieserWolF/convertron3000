@@ -26,7 +26,7 @@ deal with color clashes | visualize color clashes instantly or read out their po
 * thanks to [Green/ATW](http://csdb.dk/scener/?id=20695) for spontaneously naming Convertron3000 :)
 * thanks to people on [csdb.dk](http://csdb.dk/release/?id=155606) for commenting and giving ideas how to improve
 * thanks to Henrik Blidh for his hitherdither library [https://github.com/hbldh/hitherdither](https://github.com/hbldh/hitherdither) which I use
-# Using PetPet
+# Using Convertron 3000
 
 
 ## Usage

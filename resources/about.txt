@@ -46,7 +46,8 @@ Acknowledgments
 -  thanks to people on `csdb.dk <http://csdb.dk/release/?id=155606>`__
    for commenting and giving ideas how to improve
 -  thanks to Henrik Blidh for his hitherdither library
-   https://github.com/hbldh/hitherdither which I use # Using PetPet
+   https://github.com/hbldh/hitherdither which I use # Using Convertron
+   3000
 
 Usage
 -----
