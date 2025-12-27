@@ -185,6 +185,14 @@ or
 
 
 
+## Changes in 1.34
+
+(next release candidate)
+
+- bug fix: proper file-not-found handling when opening images
+- bug fix: fixed crash when not finding reasonable color replacement in hires mode (thanks slesinger)
+
+
 ## Changes in 1.33
 
 - added: color-clashes can be saved as image and as json
