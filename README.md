@@ -189,6 +189,7 @@ or
 (next release candidate)
 
 - rearranged the main layout to simplify the workflow (all controls are closer by now)
+- rewritten the whole code, split up into parts
 - rearranged the documentation
 - bug fix: proper file-not-found handling when opening images
 - bug fix: fixed crash when not finding reasonable color replacement in hires mode (thanks slesinger for the bug report)
