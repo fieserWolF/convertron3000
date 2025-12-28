@@ -236,6 +236,8 @@ ERROR_DIFFUSION = (
 #global variables
 def _global_variables():
         return None
+
+#settings = []
         
 root = tk.Tk()
 

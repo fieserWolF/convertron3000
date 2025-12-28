@@ -46,22 +46,6 @@ hitherdither_order=8  #2,4,8,16,32,64,128
 
 
 
-
-#https://docs.python.org/2.7/library/configparser.html#examples
-def config_read(
-    filename
-) :
-    with open(filename, "r") as f:
-        config = json.load(f)
-    
-    myGlobals.user_custom_gradient_sceme_size = int(config['size'])
-
-    for a in range(0,len(myGlobals.user_custom_gradient_sceme)) :
-        myGlobals.user_custom_gradient_sceme[a] = int(config['color'+str(a)])
-
-
-
-
 def gen_matrix( e ):
 #https://github.com/justmao945/lab/tree/master/halftoning/ordered-dithering
   ''' Generating new matrix.
@@ -474,7 +458,7 @@ def write_color_clashes_to_json_file(
     my_data
 ) :
     myGlobals.textbox.delete('1.0', tk.END)      #clear textbox
-    myGlobals.textbox.insert(tk.END,'Opening json-file "%s" for writing.\n' % filename_out)
+    myGlobals.textbox.insert(tk.END,'Opening json-file "%s" for writing color-clashes.\n' % filename_out)
     
     if ( len(my_data) > 0 ) :
         # write file
@@ -513,6 +497,41 @@ def write_color_clashes_to_json_file(
             clash_array.append( my_item )
             number += 1
         json_data['clashes'] = clash_array
+
+        #write to file
+        json.dump(json_data, file_out, indent=4)
+        file_out.close()
+        print("done.")
+
+    return None
+    
+    
+def write_settings_to_json_file(
+    filename_out,
+    my_data
+) :
+    myGlobals.textbox.delete('1.0', tk.END)      #clear textbox
+    myGlobals.textbox.insert(tk.END,'Opening json-file "%s" for writing settings.\n' % filename_out)
+
+    
+    if ( len(my_data) > 0 ) :
+        # write file
+        print ('    Opening json-file "%s" for writing.' % filename_out, end='')
+        try:
+            file_out = open(filename_out , "w")
+        except IOError as err:
+            myGlobals.textbox.insert(tk.END,"I/O error: %s\n"%format(err))
+            print("I/O error: {0}".format(err))
+            return None
+
+        json_data = {
+            'info' : {
+                'program' : myGlobals.PROGNAME,
+                'version' : myGlobals.VERSION,
+                'content' : 'settings',
+            },
+            'settings' : my_data
+        }
 
         #write to file
         json.dump(json_data, file_out, indent=4)
@@ -998,7 +1017,7 @@ def create_empty_images():
     myGlobals.label_koala_image.configure(image=myGlobals.image_koalaTk)
     myGlobals.label_koala_image.image = myGlobals.image_koala # keep a reference!
 
-    action_image_refresh()  #this will also create a preview image from the original image
+    image_refresh()  #this will also create a preview image from the original image
 
 
 
@@ -1020,32 +1039,14 @@ def load_image(
     myGlobals.image_originalTk = ImageTk.PhotoImage(myGlobals.image_original)
     myGlobals.label_original_image.configure(image=myGlobals.image_originalTk)
     myGlobals.label_original_image.image = myGlobals.image_original # keep a reference!
-    action_image_refresh()
+    image_refresh()
 
 
 
 
 
 
-#keyboard shortcuts
-def keyboard_quit(self):
-    myGlobals.root.quit()
-def keyboard_OpenFile(self):
-    action_OpenFile()
-def keyboard_SaveFile(self):
-    action_SaveFile()
-def keyboard_About(self):
-    create_gui_about()
-def keyboard_Convert(self):
-    action_convert()
-def keyboard_OpenGradient(self):
-    action_OpenGradient()
-
-
-
-
-
-def action_convert():
+def convert():
     myGlobals.convertbutton_text.set("busy...")
 
     switcher_palette = {
@@ -1095,7 +1096,7 @@ def action_convert():
 
 
 
-def action_image_refresh():
+def image_refresh():
     #prepare image_preview_convert (this image will be converted later)
     if (myGlobals.user_modes.get() == "palette") :
         image_grayscale = ImageEnhance.Color(myGlobals.image_original).enhance(0)   #make grayscale
@@ -1120,20 +1121,79 @@ def action_image_refresh():
     myGlobals.label_preview_image.image = myGlobals.image_previewTk # keep a reference!
 
     #converting every time the image is refreshed: takes a lot of time and cpu power
-    #action_convert()
+    #convert()
 
 
 	
 	
 
-def action_preview_scale(
+def preview_scale(
     scale_value
 ):
-    action_image_refresh()
+    image_refresh()
 
 
 
-def action_OpenGradient():
+def OpenSettings():
+    myGlobals.textbox.delete('1.0', tk.END)      #clear textbox
+
+    ftypes = [('settings', '*.json')]
+    filename = askopenfilename(filetypes = ftypes)
+    #filename = 'settings.json'  #debug
+    if not filename : return None
+
+    myGlobals.textbox.insert(tk.END,'Reading settings from file "%s"...\n'%filename)
+
+    #https://docs.python.org/2.7/library/configparser.html#examples
+    #with open(filename, "r") as f: data = json.load(f)
+
+    try:
+        f = open(filename, "r")
+    except FileNotFoundError as err:
+        myGlobals.textbox.insert(tk.END,'FileNotFoundError: "%s"\n'%format(err))
+        print("FileNotFoundError: {0}".format(err))
+        return None
+
+    data = json.load(f)
+
+    sanity_check = False
+    if ('info' in data) :
+        if ('content' in data['info']) :
+            if (data['info']['content'] == 'settings') : sanity_check = True
+    
+    if (sanity_check == False) :
+        myGlobals.textbox.insert(tk.END,'Wrong file format.\n')
+        return None
+    
+    if ('start address' in data['settings']) : myGlobals.user_start_address.set(data['settings']['start address'])
+    if ('start address checkbutton' in data['settings']) : myGlobals.user_start_address_checkbutton.set(data['settings']['start address checkbutton'])
+    if ('sharpness' in data['settings']) : myGlobals.user_sharpness.set(data['settings']['sharpness'])
+    if ('treshold' in data['settings']) : myGlobals.user_treshold.set(data['settings']['treshold'])
+    if ('saturation' in data['settings']) : myGlobals.user_color_saturation.set(data['settings']['saturation'])
+    if ('brightness' in data['settings']) : myGlobals.user_brightness.set(data['settings']['brightness'])
+    if ('contrast' in data['settings']) : myGlobals.user_contrast.set(data['settings']['contrast'])
+    if ('modes' in data['settings']) : myGlobals.user_modes.set(data['settings']['modes'])
+    if ('outputformat' in data['settings']) : myGlobals.user_outputformat.set(data['settings']['outputformat'])
+    if ('palette' in data['settings']) : myGlobals.user_palette.set(data['settings']['palette'])
+    if ('filename' in data['settings']) : myGlobals.user_filename_open_textvariable.set(data['settings']['filename'])
+    if ('effects blur' in data['settings']) : myGlobals.user_effects_blur.set(data['settings']['effects blur'])
+    if ('effects detail' in data['settings']) : myGlobals.user_effects_detail.set(data['settings']['effects detail'])
+    if ('effects enhance' in data['settings']) : myGlobals.user_effects_enhance.set(data['settings']['effects enhance'])
+    if ('effects enhance more' in data['settings']) : myGlobals.user_effects_enhance_more.set(data['settings']['effects enhance more'])
+    if ('effects smooth' in data['settings']) : myGlobals.user_effects_smooth.set(data['settings']['effects smooth'])
+    if ('effects smooth more' in data['settings']) : myGlobals.user_effects_smooth_more.set(data['settings']['effects smooth more'])
+    if ('effects sharpen' in data['settings']) : myGlobals.user_effects_sharpen.set(data['settings']['effects sharpen'])
+    if ('effects showclashes' in data['settings']) : myGlobals.user_effects_showClashes.set(data['settings']['effects showclashes'])
+    if ('gradient sceme' in data['settings']) : myGlobals.user_gradient_sceme.set(data['settings']['gradient sceme'])
+    if ('dithering' in data['settings']) : myGlobals.user_dithering.set(data['settings']['dithering'])
+    if ('background color' in data['settings']) : myGlobals.user_backgroundcolor.set(data['settings']['background color'])
+    
+    #myGlobals.textbox.insert(tk.END,"%d colors read.\n"%myGlobals.user_custom_gradient_sceme_size)
+    
+    image_refresh()    
+
+
+def OpenGradient():
     myGlobals.textbox.delete('1.0', tk.END)      #clear textbox
 
     ftypes = [('gradient', '*.json')]
@@ -1141,7 +1201,16 @@ def action_OpenGradient():
     if not filename : return None
 
     myGlobals.textbox.insert(tk.END,"Reading custom gradient from file \"%s\"...\n"%filename)
-    config_read(filename)
+
+    #https://docs.python.org/2.7/library/configparser.html#examples
+    with open(filename, "r") as f: config = json.load(f)
+
+    #get size
+    myGlobals.user_custom_gradient_sceme_size = int(config['size'])
+
+    #apply values
+    for a in range(0,len(myGlobals.user_custom_gradient_sceme)) :
+        myGlobals.user_custom_gradient_sceme[a] = int(config['color'+str(a)])
 
     myGlobals.textbox.insert(tk.END,"%d colors read.\n"%myGlobals.user_custom_gradient_sceme_size)
 
@@ -1150,7 +1219,7 @@ def action_OpenGradient():
         myGlobals.textbox.insert(tk.END,"color %d: %d\n"%(a,myGlobals.user_custom_gradient_sceme[a]))
     """
     
-    action_image_refresh()    
+    image_refresh()    
 
 
 
@@ -1159,7 +1228,7 @@ def action_OpenGradient():
 
 
 
-def action_OpenFile():
+def OpenFile():
     #global user_filename_open
     myGlobals.user_filename_open = ""
     
@@ -1176,11 +1245,11 @@ def loadFile(user_filename_open):
 
     myGlobals.user_filename_open_textvariable.set("\"..."+user_filename_open[-30:]+"\"")
     load_image(user_filename_open)
-#    action_convert()    
+#    convert()    
 
 
 
-def action_SaveFile():
+def SaveFile():
     myGlobals.textbox.delete('1.0', tk.END)      #clear textbox
 
     user_filename_save = ""
@@ -1191,7 +1260,7 @@ def action_SaveFile():
     user_filename_save = asksaveasfilename(filetypes = ftypes)
     if not user_filename_save : return None
 
-    action_convert()
+    convert()
 
     out_buffer = []
     
@@ -1226,19 +1295,56 @@ def action_SaveFile():
 
 
 
-def action_SaveFile_clash_json():
+def SaveFile_clash_json():
     #user_filename_save_clash_json = args.clashes_json
 
     myGlobals.textbox.delete('1.0', tk.END)      #clear textbox
 
-    user_filename_save_clash_json = asksaveasfilename(filetypes = [('json', '*.json')])
-    if not user_filename_save_clash_json : return None
+    user_filename = asksaveasfilename(filetypes = [('json', '*.json')])
+    if not user_filename : return None
 
-    write_color_clashes_to_json_file(user_filename_save_clash_json,myGlobals.color_clash_chars_xy)
+    write_settings_to_json_file(user_filename, myGlobals.color_clash_chars_xy)
+
+
+def SaveSettings():
+    #user_filename_save_clash_json = args.settings_json
+
+    myGlobals.textbox.delete('1.0', tk.END)      #clear textbox
+
+    user_filename = asksaveasfilename(filetypes = [('json', '*.json')])
+    #user_filename = 'settings.json' #debug
+    if not user_filename : return None
+
+    data = {
+        'start address' : myGlobals.user_start_address.get(),
+        'start address checkbutton' : myGlobals.user_start_address_checkbutton.get(),
+        'sharpness' : myGlobals.user_sharpness.get(),
+        'treshold' : myGlobals.user_treshold.get(),
+        'saturation' : myGlobals.user_color_saturation.get(),
+        'brightness' : myGlobals.user_brightness.get(),
+        'contrast' : myGlobals.user_contrast.get(),
+        'modes' : myGlobals.user_modes.get(),
+        'outputformat' : myGlobals.user_outputformat.get(),
+        'palette' : myGlobals.user_palette.get(),
+        'filename' : myGlobals.user_filename_open_textvariable.get(),
+        'effects blur' : myGlobals.user_effects_blur.get(),
+        'effects detail' : myGlobals.user_effects_detail.get(),
+        'effects enhance' : myGlobals.user_effects_enhance.get(),
+        'effects enhance more' : myGlobals.user_effects_enhance_more.get(),
+        'effects smooth' : myGlobals.user_effects_smooth.get(),
+        'effects smooth more' : myGlobals.user_effects_smooth_more.get(),
+        'effects sharpen' : myGlobals.user_effects_sharpen.get(),
+        'effects showclashes' : myGlobals.user_effects_showClashes.get(),
+        'gradient sceme' : myGlobals.user_gradient_sceme.get(),
+        'dithering' : myGlobals.user_dithering.get(),
+        'background color' : myGlobals.user_backgroundcolor.get(),
+    }
+
+    write_settings_to_json_file(user_filename , data)
 
 
 
-def action_SaveFile_clash_image():
+def SaveFile_clash_image():
     #global user_filename_save_clash_image
     myGlobals.user_filename_save_clash_image = ""
 
@@ -1258,8 +1364,7 @@ def action_SaveFile_clash_image():
 
 
 
-
-def action_reset_modifiers():
+def reset_modifiers():
     #global scale_modifier_list
     for a in range(0,len(myGlobals.scale_modifier_list)):
         myGlobals.scale_modifier_list[a].set( myGlobals.scale_modifier_list_default[a])

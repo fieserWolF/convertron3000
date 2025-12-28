@@ -2,7 +2,7 @@ import code.myGlobals as myGlobals
 import tkinter as tk
 
 
-def create_gui_about (
+def create_gui (
 ) :
     TEXT_HEIGHT=30
 

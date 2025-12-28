@@ -16,19 +16,22 @@ def create_drop_down_menu (
     filemenu = tk.Menu(menu)
     infomenu = tk.Menu(menu)
 
-    filemenu.add_command(label="open image...", command=action.action_OpenFile, underline=0, accelerator="Alt+O")
-    filemenu.add_command(label="save image...", command=action.action_SaveFile, underline=0, accelerator="Alt+S")
+    filemenu.add_command(label="open image...", command=action.OpenFile, underline=0, accelerator="Alt+O")
+    filemenu.add_command(label="save image...", command=action.SaveFile, underline=0, accelerator="Alt+S")
     filemenu.add_separator()
-    filemenu.add_command(label="save color-clash image...", command=action.action_SaveFile_clash_image, underline=5, accelerator="Alt+C")
-    filemenu.add_command(label="save color-clash json...", command=action.action_SaveFile_clash_json, underline=17, accelerator="Alt+J")
+    filemenu.add_command(label="open settings...", command=action.OpenSettings, underline=1, accelerator="Alt+P")
+    filemenu.add_command(label="save settings...", command=action.SaveSettings, underline=1, accelerator="Alt+V")
     filemenu.add_separator()
-    filemenu.add_command(label="open custom gradient...", command=action.action_OpenGradient, underline=5, accelerator="Alt+G")
+    filemenu.add_command(label="save color-clash image...", command=action.SaveFile_clash_image)
+    filemenu.add_command(label="save color-clash json...", command=action.SaveFile_clash_json)
+    filemenu.add_separator()
+    filemenu.add_command(label="open custom gradient...", command=action.OpenGradient)
 #    filemenu.add_command(label="save custom gradient...", command=action.action_SaveGradient, underline=5, accelerator="Alt+H")
     filemenu.add_separator()
     filemenu.add_command(label="quit", command=root.quit, underline=0, accelerator="Alt+Q")
 
-    infomenu.add_command(label="help", command=gui_help.create_gui_help, underline=0, accelerator="f1")
-    infomenu.add_command(label="about", command=gui_about.create_gui_about)
+    infomenu.add_command(label="help", command=gui_help.create_gui, underline=0, accelerator="f1")
+    infomenu.add_command(label="about", command=gui_about.create_gui)
 
     #add all menus
     menu.add_cascade(label="menu", menu=filemenu, underline=0, accelerator="Alt+m")
@@ -105,7 +108,7 @@ def create_gui_settings_modifiers (
             label=text,
             length=200,
             cursor=myGlobals.CURSOR_HAND,
-            command=action.action_preview_scale
+            command=action.preview_scale
         )
         scale_modifier.grid(
             row=my_row,
@@ -123,7 +126,7 @@ def create_gui_settings_modifiers (
         frame_inner,
         bg=myGlobals.BGCOLOR,
         text = "reset",
-        command=action.action_reset_modifiers,
+        command=action.reset_modifiers,
         cursor=myGlobals.CURSOR_HAND,
     )
     button_reset.grid(
@@ -196,7 +199,7 @@ def create_gui_settings_effects (
             text=text,
             variable=var,
             cursor=myGlobals.CURSOR_HAND,
-            command=action.action_image_refresh
+            command=action.image_refresh
         )
         checkbutton_effects.grid(
             row=my_row,
@@ -264,7 +267,7 @@ def create_gui_settings_outputformat (
             indicatoron=0,
             variable=myGlobals.user_outputformat,
             cursor=myGlobals.CURSOR_HAND,
-            command=action.action_image_refresh
+            command=action.image_refresh
         )
         radiobutton_user_mode.grid(
             row=row,
@@ -332,7 +335,7 @@ def create_gui_settings_mode (
             indicatoron=0,
             variable=myGlobals.user_modes,
             cursor=myGlobals.CURSOR_HAND,
-            command=action.action_image_refresh
+            command=action.image_refresh
         )
         _row += 1
         radiobutton_user_mode.grid(
@@ -440,7 +443,7 @@ def create_gui_backgroundcolor (
         indicatoron=0,
         variable=myGlobals.user_backgroundcolor,
         cursor=myGlobals.CURSOR_HAND
-        #command=action.action_convert
+        #command=action.convert
     )
     radiobutton_automatic.grid(
         row=1,
@@ -511,7 +514,7 @@ def create_gui_palette_brightness_mode (
             value = mode,
             indicatoron=0,
             variable=myGlobals.user_gradient_sceme,
-            command=action.action_image_refresh,
+            command=action.image_refresh,
             cursor=myGlobals.CURSOR_HAND
         )
         radiobutton_user_mode.grid(
@@ -581,7 +584,7 @@ def create_gui_dithering (
             value = mode,
             indicatoron=0,
             variable=myGlobals.user_dithering,
-            command=action.action_image_refresh,
+            command=action.image_refresh,
             cursor=myGlobals.CURSOR_HAND
         )
         radiobutton_user_mode.grid(
@@ -652,7 +655,7 @@ def create_gui_settings_palette (
             indicatoron=0,
             variable=myGlobals.user_palette,
             cursor=myGlobals.CURSOR_HAND,
-            command=action.action_image_refresh
+            command=action.image_refresh
         )
         radiobutton_user_mode.grid(
             row=row,
@@ -830,7 +833,7 @@ def create_gui_action_buttons (
         textvariable = myGlobals.convertbutton_text,
         width=7,
         height=3,
-        command=action.action_convert,
+        command=action.convert,
         cursor=myGlobals.CURSOR_HAND
     )
     #placement in grid layout
@@ -1203,14 +1206,8 @@ def _start_gui() :
         0   #column
     )
 
+
             
-    myGlobals.root.bind_all("<Alt-q>", action.keyboard_quit)
-    myGlobals.root.bind_all("<Alt-o>", action.keyboard_OpenFile)
-    myGlobals.root.bind_all("<Alt-s>", action.keyboard_SaveFile)
-    myGlobals.root.bind_all("<Alt-a>", action.keyboard_About)
-    myGlobals.root.bind_all("<Alt-c>", action.keyboard_Convert)
-    myGlobals.root.bind_all("<Alt-g>", action.keyboard_OpenGradient)
-    #myGlobals.root.bind_all("<Alt-h>", action.keyboard_SaveGradient)
 
     action.create_empty_images()
     

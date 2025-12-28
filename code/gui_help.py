@@ -3,7 +3,7 @@ import tkinter as tk
 
 
 
-def create_gui_help (
+def create_gui (
 ) :
     TEXT_HEIGHT=30
 

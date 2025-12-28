@@ -1,0 +1,31 @@
+{
+    "info": {
+        "program": "CONVERTRON3000",
+        "version": "v1.34 [build 251225-195551]",
+        "content": "settings"
+    },
+    "settings": {
+        "start address": "6000",
+        "start address checkbutton": 1,
+        "sharpness": 92,
+        "treshold": 20,
+        "saturation": 97,
+        "brightness": 99,
+        "contrast": 100,
+        "modes": "colors",
+        "outputformat": "hires",
+        "palette": "view64",
+        "filename": "\"...erica.png\"",
+        "effects blur": 0,
+        "effects detail": 1,
+        "effects enhance": 1,
+        "effects enhance more": 0,
+        "effects smooth": 0,
+        "effects smooth more": 0,
+        "effects sharpen": 0,
+        "effects showclashes": 0,
+        "gradient sceme": "gray",
+        "dithering": "line",
+        "background color": 3
+    }
+}

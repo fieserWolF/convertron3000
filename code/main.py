@@ -23,11 +23,29 @@ def _main_procedure() :
     #parser.add_argument('-o', '--output', dest='clashes_image', help='filename of color-clash image (default="'+FILENAME_CLASH_IMAGE_PRE+'")', default=FILENAME_CLASH_IMAGE_PRE)
     parser.add_argument('-d', '--debug', dest='debug_clashes', help='show color-clashes on consule', action='store_true')
     myGlobals.args = parser.parse_args()
-
+    
     gui._start_gui()
 
     if (myGlobals.args.input_image) :
         action.loadFile(myGlobals.args.input_image)
+
+
+    #keyboard shortcuts
+    myGlobals.root.bind_all("<Alt-q>", lambda event: myGlobals.root.quit())
+    myGlobals.root.bind_all("<Alt-o>", lambda event: action.OpenFile())
+    myGlobals.root.bind_all("<Alt-s>", lambda event: action.SaveFile())
+    myGlobals.root.bind_all("<F1>", lambda event: gui_help.create_gui())
+    myGlobals.root.bind_all("<Alt-c>", lambda event: action.convert())
+    myGlobals.root.bind_all("<Alt-d>", lambda event: action.debug_settings())
+    myGlobals.root.bind_all("<Alt-p>", lambda event: action.OpenSettings())
+    myGlobals.root.bind_all("<Alt-v>", lambda event: action.SaveSettings())
+    #myGlobals.root.bind_all("<Alt-g>", lambda event: action.OpenGradient())
+    #myGlobals.root.bind_all("<Alt-h>", lambda event: action.action_SaveGradient())
+
+    #action.SaveSettings()
+    #action.OpenSettings()
+
+    
 
     tk.mainloop()
 
