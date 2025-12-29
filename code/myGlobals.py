@@ -44,6 +44,7 @@ KOALA_WIDTH = 160
 KOALA_HEIGHT = 200
 HIRES_WIDTH = 320
 HIRES_HEIGHT = 200
+C64_COLOR_AMOUNT = 16
 
 
 PALETTEDATA_PEPTO = (
@@ -241,58 +242,76 @@ def _global_variables():
         
 root = tk.Tk()
 
+
 user_filename_open = "none"
 user_filename_save = "none"
 user_filename_save_clash_json = "none"
 user_filename_save_clash_image = "none"
 
-user_start_address = tk.StringVar()
-user_start_address_checkbutton = tk.IntVar()
-user_sharpness = tk.IntVar()
-user_treshold = tk.IntVar()
-user_color_saturation = tk.IntVar()
-user_brightness = tk.IntVar()
-user_contrast = tk.IntVar()
-user_modes = tk.StringVar()
-user_outputformat = tk.StringVar()
-user_palette = tk.StringVar()
-user_filename_open_textvariable = tk.StringVar()
+user_start_address = tk.StringVar(root, name='start address')
+user_start_address_checkbutton = tk.IntVar(root, name='start address enable')
+user_sharpness = tk.IntVar(root, name='sharpness')
+user_treshold = tk.IntVar(root, name='treshold')
+user_color_saturation = tk.IntVar(root, name='saturation')
+user_brightness = tk.IntVar(root, name='brightness')
+user_contrast = tk.IntVar(root, name='contrast')
+user_modes = tk.StringVar(root, name='modes')
+user_outputformat = tk.StringVar(root, name='outputformat')
+user_palette = tk.StringVar(root, name='palette')
+user_filename_open_textvariable = tk.StringVar(root, name='filename')
 convertbutton_text = tk.StringVar()
 
-user_effects_blur = tk.IntVar()
-user_effects_detail = tk.IntVar()
-user_effects_enhance = tk.IntVar()
-user_effects_enhance_more = tk.IntVar()
-user_effects_smooth = tk.IntVar()
-user_effects_smooth_more = tk.IntVar()
-user_effects_sharpen = tk.IntVar()
-user_effects_showClashes = tk.IntVar()
+user_effects_blur = tk.IntVar(root, name='effects blur')
+user_effects_detail = tk.IntVar(root, name='effects detail')
+user_effects_enhance = tk.IntVar(root, name='effects enhance')
+user_effects_enhance_more = tk.IntVar(root, name='effects enhance more')
+user_effects_smooth = tk.IntVar(root, name='effects smooth')
+user_effects_smooth_more = tk.IntVar(root, name='effects smooth more')
+user_effects_sharpen = tk.IntVar(root, name='effects sharpen')
+user_effects_showClashes = tk.IntVar(root, name='effects showClashes')
 
-user_gradient_sceme = tk.StringVar()
-user_dithering = tk.StringVar()
-user_backgroundcolor = tk.IntVar()
+user_gradient_sceme = tk.StringVar(root, name='gradient')
+user_dithering = tk.StringVar(root, name='dithering')
+user_backgroundcolor = tk.IntVar(root, name='backgroundcolor')
 user_backgroundcolor.set(99)
 
 
 #defaults
-user_outputformat.set("koala")
-user_modes.set("colors")
-user_palette.set("pepto")
-user_gradient_sceme.set("purple")
+settings = {
+    'start address' : None,
+    'start address enable' : None,
+    'sharpness' : 0,
+    'treshold' : 0,
+    'saturation' : 0,
+    'brightness' : 0,
+    'contrast' : 0,
+    'modes' : 'colors',
+    'outputformat' : 'koala',
+    'palette' : 'pepto',
+    'filename' : 'none',
+    'effects blur' : 0,
+    'effects detail' : 0,
+    'effects enhance' : 0,
+    'effects enhance more' : 0,
+    'effects smooth' : 0,
+    'effects smooth more' : 0,
+    'effects sharpen' : 0,
+    'effects showClashes' : 0,
+    'gradient' : 'purple',
+    'dithering' : 'none',
+    'backgroundcolor' : 0,
+}
 user_filename_open_textvariable.set("none")
 convertbutton_text.set("convert\nAlt+C")
-user_dithering.set("none")
-#user_dithering.set("bayer")
-
 
 textbox = tk.Text()
 label_original_image = tk.Label()
 label_preview_image = tk.Label()
 label_koala_image = tk.Label()
-image_original = PilImage.new("RGB", (320, 200), "black")
-image_preview = PilImage.new("RGB", (320, 200), "black")
-image_koala = PilImage.new("RGBA", (320, 200), "black")
-image_preview_convert = PilImage.new("RGB", (160, 200), "black")
+image_original = PilImage.new("RGB", (HIRES_WIDTH,HIRES_HEIGHT), "black")
+image_preview = PilImage.new("RGB", (HIRES_WIDTH,HIRES_HEIGHT), "black")
+image_koala = PilImage.new("RGBA", (HIRES_WIDTH,HIRES_HEIGHT), "black")
+image_preview_convert = PilImage.new("RGB", (KOALA_WIDTH,KOALA_HEIGHT), "black")
 
 koala_bitmap=[None]*8000
 koala_col12=[None]*1000
@@ -302,21 +321,19 @@ koala_bg=0
 koala_colorindex_data = [0] * KOALA_WIDTH*KOALA_HEIGHT
 hires_colorindex_data = [0] * HIRES_WIDTH*HIRES_HEIGHT
 
-#initialize empty 320x200 data
+#initialize empty images
 image_result_koala = PilImage.new("P", (KOALA_WIDTH, KOALA_HEIGHT))
 image_result_hires = PilImage.new("P", (HIRES_WIDTH, HIRES_HEIGHT))
 
 image_clashes = PilImage.new("P", (KOALA_WIDTH, KOALA_HEIGHT))
-#image_clashes_koala = PilImage.new("P", (KOALA_WIDTH, KOALA_HEIGHT))
-#image_clashes_hires = PilImage.new("P", (HIRES_WIDTH, HIRES_HEIGHT))
 
 
 scale_modifier_list=[]
 scale_modifier_list_default=[]
 
-user_custom_gradient_sceme = [0] * 16
+user_custom_gradient_sceme = [0] * C64_COLOR_AMOUNT
 user_custom_gradient_sceme_size = 0
 
 color_clash_chars_xy = []
 
-args = 0
+args = []

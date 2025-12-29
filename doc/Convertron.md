@@ -40,6 +40,19 @@ Using Convertron3000 is pretty straight-forward:
 * Save the resulting image.
 
 
+## shortcuts
+
+key | function
+---|---
+F1 | help
+Alt-o | open image
+Alt-s | save image (koala or hires format)
+Alt-c | convert image
+Alt-p | open settings
+Alt-v | save settings
+Alt-q | quit
+
+
 ## Dithering
 
 As of now, Convertron3000 offers various dithering methods.
@@ -94,8 +107,8 @@ The hires bitmap is stored in the widely-spread Advanced Art Studio (.art) forma
 
 # Commandline options
 
-	CONVERTRON3000 v1.33 [build 250322-030736] *** by fieserWolF
-	usage: convertron.py [-h] [-i INPUT_IMAGE] [-c CLASHES_JSON] [-o CLASHES_IMAGE] [-d]
+	CONVERTRON3000 v1.34 [build 251225-195551] *** by fieserWolF
+	usage: convertron.py [-h] [-i INPUT_IMAGE] [-g FILE_GRADIENT] [-s FILE_SETTINGS] [-d]
 
 	This program reads an image-file, lets the user adjust settings and converts it to a C64 koala or hires image.
 
@@ -103,24 +116,23 @@ The hires bitmap is stored in the widely-spread Advanced Art Studio (.art) forma
 	  -h, --help            show this help message and exit
 	  -i, --image INPUT_IMAGE
 							image file)
-	  -c, --clashes CLASHES_JSON
-							filename of report containing all color-clashes (in json-format (default="/tmp/color_clashes.json")
-	  -o, --output CLASHES_IMAGE
-							filename of color-clash image (default="/tmp/color_clashes.png")
+	  -g, --gradient FILE_GRADIENT
+							filename of custom gradient file (JSON) to be loaded
+	  -s, --settings FILE_SETTINGS
+							filename of settings file (JSON) to be loaded
 	  -d, --debug           show color-clashes on consule
 
-	Example: ./convertron.py -i image.png -c /tmp/clashes.json -d
+	Example: ./convertron.py -i image.png -g 8color_gradient-brown.json -s settings.json -d
 # Getting Started
 
 Convertron3000 comes in two flavors:
 
-- standalone executable for 64-bit systems Linux, MacOS/Darwin and Windows (see [releases](https://github.com/fieserWolF/convertron3000/releases))
-- Python3 script
+- Python3 script if you have python3 installed on your system (preferred method)
+- executable for Linux and Windows (see [releases](https://github.com/fieserWolF/convertron3000/releases))
 
-## Run the standalone executable
+## Run the executable
 
-Just download your bundle at [releases](https://github.com/fieserWolF/convertron3000/releases) and enjoy.
-Keep in mind that only 64bit systems are supported as I could not find a 32bit system to generate the bundle.
+Just download your zip-bundle at [releases](https://github.com/fieserWolF/convertron3000/releases), extract it to a folder of your choice and enjoy.
 
 ### Note for Windows users
 
@@ -131,7 +143,8 @@ I even tried my best and re-compiled the PyInstaller bootloader so that this sho
 
 ### Note for MacOS users
 
-Your system might complain that the code is not signed by a certificated developer. Well, I am not, so I signed the program on my own. 
+In [releases](https://github.com/fieserWolF/convertron3000/releases) you also find older versions of Convertron 3000 compiled as standalone executables.
+You may use this, but your system might complain that the code is not signed by a certificated developer. Well, I am not, so I signed the program on my own. 
 ```
 "Convertron3000" can`t be opened because it is from an unidentified developer.
 ```
@@ -184,7 +197,7 @@ or
 
 
 
-## Changes in 1.34
+## Changes in 1.34 (on Dream210 Party 2025)
 
 (next release candidate)
 
@@ -192,6 +205,7 @@ or
 - rearranged the main layout to simplify the workflow (all controls are closer by now)
 - rewritten the whole code, split up into parts
 - rearranged the documentation
+- responsive GUI
 - bug fix: proper file-not-found handling when opening images
 - bug fix: fixed crash when not finding reasonable color replacement in hires mode (thanks slesinger for the bug report)
 

@@ -12,6 +12,21 @@ Using Convertron3000 is pretty straight-forward:
 -  optional: Check position of color-clashes.
 -  Save the resulting image.
 
+shortcuts
+---------
+
+===== ==================================
+key   function
+===== ==================================
+F1    help
+Alt-o open image
+Alt-s save image (koala or hires format)
+Alt-c convert image
+Alt-p open settings
+Alt-v save settings
+Alt-q quit
+===== ==================================
+
 Dithering
 ---------
 
@@ -87,8 +102,8 @@ Commandline options
 
 ::
 
-   CONVERTRON3000 v1.33 [build 250322-030736] *** by fieserWolF
-   usage: convertron.py [-h] [-i INPUT_IMAGE] [-c CLASHES_JSON] [-o CLASHES_IMAGE] [-d]
+   CONVERTRON3000 v1.34 [build 251225-195551] *** by fieserWolF
+   usage: convertron.py [-h] [-i INPUT_IMAGE] [-g FILE_GRADIENT] [-s FILE_SETTINGS] [-d]
 
    This program reads an image-file, lets the user adjust settings and converts it to a C64 koala or hires image.
 
@@ -96,10 +111,10 @@ Commandline options
      -h, --help            show this help message and exit
      -i, --image INPUT_IMAGE
                            image file)
-     -c, --clashes CLASHES_JSON
-                           filename of report containing all color-clashes (in json-format (default="/tmp/color_clashes.json")
-     -o, --output CLASHES_IMAGE
-                           filename of color-clash image (default="/tmp/color_clashes.png")
+     -g, --gradient FILE_GRADIENT
+                           filename of custom gradient file (JSON) to be loaded
+     -s, --settings FILE_SETTINGS
+                           filename of settings file (JSON) to be loaded
      -d, --debug           show color-clashes on consule
 
-   Example: ./convertron.py -i image.png -c /tmp/clashes.json -d
+   Example: ./convertron.py -i image.png -g 8color_gradient-brown.json -s settings.json -d

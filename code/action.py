@@ -128,7 +128,7 @@ def image_quantize_c64_colors(image):
     if (myGlobals.user_dithering.get() == 'floyd-steinberg') :
         pal_image.putpalette(
             (my_palettedata)
-            +(0,0,0)*(256-16)
+            +(0,0,0)*(256-myGlobals.C64_COLOR_AMOUNT)
         )
         quantisized_image = image.im.convert("P",1,pal_image.im)
         image = image._new(quantisized_image)
@@ -136,7 +136,7 @@ def image_quantize_c64_colors(image):
     if (myGlobals.user_dithering.get() == 'none') :
         pal_image.putpalette(
             (my_palettedata)
-            +(0,0,0)*(256-16)
+            +(0,0,0)*(256-myGlobals.C64_COLOR_AMOUNT)
         )
         quantisized_image = image.im.convert("P",0,pal_image.im)
         image = image._new(quantisized_image)
@@ -365,7 +365,7 @@ def convert_to_koala_find_replace_color(
     # find the next better color of the 4 most used ones (color table)
     found=False;
     return_value=0
-    for a in range (0,15):  #should be 0,16
+    for a in range (0,myGlobals.C64_COLOR_AMOUNT-1):  #should be 0,myGlobals.C64_COLOR_AMOUNT
         for b in range (0,4):
             if (
                 (found == False) &
@@ -421,8 +421,8 @@ def convert_to_koala_sort_palette(
     palette
 ):    
     #normal bubble sort, sort colors: mostly used first, least used last
-    for a in range(0,16):
-        for b in range(0,16):
+    for a in range(0,myGlobals.C64_COLOR_AMOUNT):
+        for b in range(0,myGlobals.C64_COLOR_AMOUNT):
             if (a==b) : continue
             if (palette[a][1] > palette[b][1]):
                 palette[b], palette[a] = palette[a].copy(), palette[b].copy() 
@@ -437,14 +437,14 @@ def convert_to_koala_find_best_background_color(
     sets background color ($d021) to the most used color in the original image
     """    
     #my_palette = numpy.zeros((16,2), dtype=numpy.uint8)    #32 bytes 
-    my_palette = [ [0] *2 for i in range(16) ]    #32 bytes 
+    my_palette = [ [0] *2 for i in range(myGlobals.C64_COLOR_AMOUNT) ]    #32 bytes 
     
     #init
-    for y in range (0,16) : my_palette[y][0] = y    #color
-    for y in range (0,16) : my_palette[y][1] = 0    #amount
+    for y in range (0,myGlobals.C64_COLOR_AMOUNT) : my_palette[y][0] = y    #color
+    for y in range (0,myGlobals.C64_COLOR_AMOUNT) : my_palette[y][1] = 0    #amount
 
-    for y in range (0,200) :
-        for x in range (0,160) :
+    for y in range (0,myGlobals.KOALA_HEIGHT) :
+        for x in range (0,myGlobals.KOALA_WIDTH) :
             my_palette[bmp_bitmap[y][x]][1] += 1  #amount
 
     convert_to_koala_sort_palette(my_palette)
@@ -458,52 +458,48 @@ def write_color_clashes_to_json_file(
     my_data
 ) :
     myGlobals.textbox.delete('1.0', tk.END)      #clear textbox
-    myGlobals.textbox.insert(tk.END,'Opening json-file "%s" for writing color-clashes.\n' % filename_out)
+    if ( len(my_data) == 0 ) :
+        myGlobals.textbox.insert(tk.END,'No color-clashes found, so not writing anything.\n')
+        return None
+
+    myGlobals.textbox.delete('1.0', tk.END)      #clear textbox
+    myGlobals.textbox.insert(tk.END,'Opening json-file "%s" for writing %d color-clashes.\n' % (filename_out, len(my_data)))
     
-    if ( len(my_data) > 0 ) :
-        # write file
-        print ('    Opening json-file "%s" for writing.' % filename_out, end='')
-        try:
-            file_out = open(filename_out , "w")
-        except IOError as err:
-            myGlobals.textbox.insert(tk.END,"I/O error: %s\n"%format(err))
-            print("I/O error: {0}".format(err))
-            return None
+    # write file
+    try:
+        file_out = open(filename_out , "w")
+    except IOError as err:
+        myGlobals.textbox.insert(tk.END,"I/O error: %s\n"%format(err))
+        #print("I/O error: {0}".format(err))
+        return None
+    
+    json_data = {
+        'info' : {
+                'program' : myGlobals.PROGNAME,
+                'version' : myGlobals.VERSION,
+                'content' : 'color clashes',
+                'clashes amount' : len(my_data),
+            }
+    }
+    
+    json_data['clashes'] = []
+    number = 0
+    for c in my_data :
+        json_data['clashes'].append(
+            {
+                'id' : number,
+                'x' : c[0],
+                'y' : c[1],
+                'colors used' : c[2],
+                'colors' : c[3]
+            }
+        )
+        number += 1
 
-        json_data = {}
+    #write to file
+    json.dump(json_data, file_out, indent=4)
+    file_out.close()
 
-        #info
-        my_item = {}
-        my_item['program'] = myGlobals.PROGNAME
-        my_item['version'] = myGlobals.VERSION
-        my_item['clashes amount'] = len(my_data)
-        json_data['info'] = my_item
-
-
-        #Color clashes
-        clash_array = []
-        number = 0
-        for c in my_data :
-            #posx
-            my_item = {}
-            my_item['number'] = number
-            my_item['x'] = c[0]
-            my_item['y'] = c[1]
-            my_item['colors used'] = c[2]
-            used_colors = []
-            for r in c[3] :
-                used_colors.append(r)
-            my_item['colors'] = used_colors
-            clash_array.append( my_item )
-            number += 1
-        json_data['clashes'] = clash_array
-
-        #write to file
-        json.dump(json_data, file_out, indent=4)
-        file_out.close()
-        print("done.")
-
-    return None
     
     
 def write_settings_to_json_file(
@@ -585,7 +581,7 @@ def convert_to_koala(
     bitmap = [[ [0] * 8 for i in range(myGlobals.C64_CHAR_WIDTH)] for i in range(myGlobals.C64_CHAR_HEIGHT)]    #8000 bytes
     screen = [ [0] * myGlobals.C64_CHAR_WIDTH for i in range(myGlobals.C64_CHAR_HEIGHT)]    #1000 bytes
     colram = [ [0] * myGlobals.C64_CHAR_WIDTH for i in range(myGlobals.C64_CHAR_HEIGHT)]    #1000 bytes
-    palette = [ [0] * 2 for i in range(16)]    #32 bytes   palette[x][0]=color palette  /  [x][1]=amount
+    palette = [ [0] * 2 for i in range(myGlobals.C64_COLOR_AMOUNT)]    #32 bytes   palette[x][0]=color palette  /  [x][1]=amount
     
     user_koala_bg_color = myGlobals.user_backgroundcolor.get()
 
@@ -594,12 +590,12 @@ def convert_to_koala(
     myGlobals.root.update()
 
 
-    #fill bmp_bitmap with image_preview 160x200 data
-    bmp_bitmap = [ [0] * 160 for i in range(200) ]
+    #fill bmp_bitmap with image_preview KOALA_WIDTH x KOALA_HEIGHT data
+    bmp_bitmap = [ [0] * myGlobals.KOALA_WIDTH for i in range(myGlobals.KOALA_HEIGHT) ]
     my_list = list(myGlobals.image_preview_convert.getdata()) #image is in "P" mode
-    for y in range(0,200) :
-        for x in range(0,160) :
-            bmp_bitmap[y][x] = my_list[(y*160)+x]
+    for y in range(0,myGlobals.KOALA_HEIGHT) :
+        for x in range(0,myGlobals.KOALA_WIDTH) :
+            bmp_bitmap[y][x] = my_list[(y*myGlobals.KOALA_WIDTH)+x]
 
 
     #converting to koala: begin...
@@ -629,7 +625,7 @@ def convert_to_koala(
             
             # count all colors in this block: make palette
             # clear palette
-            for c in range (0,16):
+            for c in range (0,myGlobals.C64_COLOR_AMOUNT):
                 palette[c][0]=c  #palette[c].color
                 palette[c][1]=0	# clear amount palette[c].amount
 
@@ -645,7 +641,7 @@ def convert_to_koala(
             
             used_colors_count = 0
             used_colors_colors = []
-            for c in range (0,16):
+            for c in range (0,myGlobals.C64_COLOR_AMOUNT):
                 if (palette[c][1] > 0): #palette[c].amount
                     used_colors_count += 1  #this color has already been used (amount > 0)
                     used_colors_colors.append(palette[c][0])    #store color number of used color
@@ -663,7 +659,7 @@ def convert_to_koala(
                 #print("")
 
 
-                for c in range (4,16):  #find a solution for fourth, fifth, sixth... color if it is used
+                for c in range (4,myGlobals.C64_COLOR_AMOUNT):  #find a solution for fourth, fifth, sixth... color if it is used
                     if (palette[c][1]>0):   #palette[c].amount
                         color_clash_counter += 1
                         solution = convert_to_koala_find_replace_color(palette, palette[c][0])    #palette.color
@@ -734,7 +730,7 @@ def convert_to_hires_find_replace_color(
     # find the next better color of the 4 most used ones (color table)
     found=False;
     return_value=0
-    for a in range (0,15):  #should be 0,16
+    for a in range (0,myGlobals.C64_COLOR_AMOUNT-1):  #should be 0,myGlobals.C64_COLOR_AMOUNT
         for b in range (0,2):
             if (
                 (found == False) &
@@ -805,7 +801,7 @@ def convert_to_hires(
     block = [ [0] * 8 for i in range(8)]    #8*8 = 64 bytes
     bitmap = [[ [0] * 8 for i in range(myGlobals.C64_CHAR_WIDTH)] for i in range(myGlobals.C64_CHAR_HEIGHT)]    #25*40*8 = 8000 bytes
     screen = [ [0] * myGlobals.C64_CHAR_WIDTH for i in range(myGlobals.C64_CHAR_HEIGHT)]    #25*40 = 1000 bytes
-    palette = [ [0] * 2 for i in range(16)]    #16*2 = 32 bytes   palette[x][0]=color palette  /  [x][1]=amount
+    palette = [ [0] * 2 for i in range(myGlobals.C64_COLOR_AMOUNT)]    #16*2 = 32 bytes   palette[x][0]=color palette  /  [x][1]=amount
  
     
     myGlobals.textbox.insert(tk.END,"procedure \"convert_to_hires\": working...\n")
@@ -839,7 +835,7 @@ def convert_to_hires(
                     block[c][d] = bmp_bitmap[y*8+c][x*8+d]
             
             # count all colors in this block: make palette
-            for c in range (0,16):
+            for c in range (0,myGlobals.C64_COLOR_AMOUNT):
                 palette[c][1]=0	# clear amount palette[c].amount
                 palette[c][0]=c  #palette[c].color
 
@@ -853,7 +849,7 @@ def convert_to_hires(
 
             used_colors_count = 0
             used_colors_colors = []
-            for c in range (0,16):
+            for c in range (0,myGlobals.C64_COLOR_AMOUNT):
                 if (palette[c][1] > 0): #palette[c].amount
                     used_colors_count += 1  #this color has already been used (amount > 0)
                     used_colors_colors.append(palette[c][0])    #store color number of used color
@@ -867,7 +863,7 @@ def convert_to_hires(
                 my_coords.append(used_colors_colors)
                 myGlobals.color_clash_chars_xy.append(my_coords)
 
-                for c in range (2,16):  #color[0] and color[1] of the palette are used mostly, keep them. replace the others (2..15)
+                for c in range (2,myGlobals.C64_COLOR_AMOUNT):  #color[0] and color[1] of the palette are used mostly, keep them. replace the others (2..15)
                     if (palette[c][1]>0):   #palette[c].amount
                         color_clash_counter += 1
                         solution = convert_to_hires_find_replace_color(palette, palette[c][0])    #palette.color
@@ -929,7 +925,7 @@ def convert_to_hires(
 def image_preview_create_effects(
     my_image
 ) :
-    """creates the preview image 160x200 object"""
+    """creates the preview image myGlobals.KOALA_WIDTH x myGlobals.KOALA_HEIGHT object"""
 
 #Hue-Saturation-Lightness
 #contrast
@@ -983,7 +979,7 @@ def prepare_image_color_clashes():
     myGlobals.image_clashes = myGlobals.image_koala
     if (len(myGlobals.color_clash_chars_xy) == 0): return None
 
-    image_markers = PilImage.new("RGBA", (320,200), (0,0,0,0))
+    image_markers = PilImage.new("RGBA", (myGlobals.HIRES_WIDTH,myGlobals.HIRES_HEIGHT), (0,0,0,0))
     img1 = ImageDraw.Draw(image_markers)
     for i in myGlobals.color_clash_chars_xy:
         img1.rectangle(
@@ -1007,39 +1003,18 @@ def prepare_image_color_clashes():
 
 
 def create_empty_images():
-    myGlobals.image_original = PilImage.new("RGB",(320,200), "BLACK")
+    myGlobals.image_original = PilImage.new("RGB",(myGlobals.HIRES_WIDTH,myGlobals.HIRES_HEIGHT), "BLACK")
     myGlobals.image_originalTk = ImageTk.PhotoImage(myGlobals.image_original)
     myGlobals.label_original_image.configure(image=myGlobals.image_originalTk)
     myGlobals.label_original_image.image = myGlobals.image_original # keep a reference!
 
-    myGlobals.image_koala = PilImage.new("RGB",(320,200), "BLACK")
+    myGlobals.image_koala = PilImage.new("RGB",(myGlobals.HIRES_WIDTH,myGlobals.HIRES_HEIGHT), "BLACK")
     myGlobals.image_koalaTk = ImageTk.PhotoImage(myGlobals.image_koala)
     myGlobals.label_koala_image.configure(image=myGlobals.image_koalaTk)
     myGlobals.label_koala_image.image = myGlobals.image_koala # keep a reference!
 
     image_refresh()  #this will also create a preview image from the original image
 
-
-
-def load_image(
-	filename
-):
-    myGlobals.textbox.delete('1.0', tk.END)      #clear textbox
-    myGlobals.textbox.insert(tk.END,'Opening image "%s".\n' % filename)
-
-    try:
-        myGlobals.image_original = PilImage.open(filename)
-    except FileNotFoundError as err:
-        myGlobals.textbox.insert(tk.END,"FileNotFoundError: %s\n"%format(err))
-        print("FileNotFoundError: {0}".format(err))
-        return None
-
-    myGlobals.image_original = myGlobals.image_original.resize((320,200), resample=PilImage.NEAREST)
-    myGlobals.image_original = myGlobals.image_original.convert("RGB")
-    myGlobals.image_originalTk = ImageTk.PhotoImage(myGlobals.image_original)
-    myGlobals.label_original_image.configure(image=myGlobals.image_originalTk)
-    myGlobals.label_original_image.image = myGlobals.image_original # keep a reference!
-    image_refresh()
 
 
 
@@ -1066,7 +1041,7 @@ def convert():
         myGlobals.image_result_koala.putpalette(my_palettedata)
         myGlobals.image_result_koala.putdata(myGlobals.koala_colorindex_data)
 
-        myGlobals.image_koala = myGlobals.image_result_koala.resize((320,200), resample=PilImage.NEAREST).convert("RGBA")
+        myGlobals.image_koala = myGlobals.image_result_koala.resize((myGlobals.HIRES_WIDTH,myGlobals.HIRES_HEIGHT), resample=PilImage.NEAREST).convert("RGBA")
        
         
     if (myGlobals.user_outputformat.get()=='hires') :
@@ -1102,17 +1077,17 @@ def image_refresh():
         image_grayscale = ImageEnhance.Color(myGlobals.image_original).enhance(0)   #make grayscale
         myGlobals.image_preview_convert = image_preview_create_effects(image_grayscale)   #apply effects
         if (myGlobals.user_outputformat.get() == "koala") :
-            myGlobals.image_preview_convert = myGlobals.image_preview_convert.resize((160,200), resample=PilImage.NEAREST)
+            myGlobals.image_preview_convert = myGlobals.image_preview_convert.resize((myGlobals.KOALA_WIDTH,myGlobals.KOALA_HEIGHT), resample=PilImage.NEAREST)
         myGlobals.image_preview_convert = image_quantize_paletted_brightness(myGlobals.image_preview_convert).convert("RGB")   #quantisize to selected gradient
     else:
         myGlobals.image_preview_convert = image_preview_create_effects(myGlobals.image_original)
         if (myGlobals.user_outputformat.get() == "koala") :
-            myGlobals.image_preview_convert = myGlobals.image_preview_convert.resize((160,200), resample=PilImage.NEAREST)
+            myGlobals.image_preview_convert = myGlobals.image_preview_convert.resize((myGlobals.KOALA_WIDTH,myGlobals.KOALA_HEIGHT), resample=PilImage.NEAREST)
     myGlobals.image_preview_convert = image_quantize_c64_colors(myGlobals.image_preview_convert)
 
     #prepare image_preview (this image will only be seen in preview window)
     if (myGlobals.user_outputformat.get() == "koala") :
-        myGlobals.image_preview = myGlobals.image_preview_convert.resize((320,200), resample=PilImage.NEAREST)
+        myGlobals.image_preview = myGlobals.image_preview_convert.resize((myGlobals.HIRES_WIDTH,myGlobals.HIRES_HEIGHT), resample=PilImage.NEAREST)
     if (myGlobals.user_outputformat.get() == "hires") :
         myGlobals.image_preview = myGlobals.image_preview_convert
 
@@ -1120,9 +1095,7 @@ def image_refresh():
     myGlobals.label_preview_image.configure(image=myGlobals.image_previewTk)
     myGlobals.label_preview_image.image = myGlobals.image_previewTk # keep a reference!
 
-    #converting every time the image is refreshed: takes a lot of time and cpu power
-    #convert()
-
+    #convert()      #converting every time the image is refreshed: takes a lot of time and cpu power
 
 	
 	
@@ -1134,18 +1107,19 @@ def preview_scale(
 
 
 
-def OpenSettings():
+def OpenSettings_FileDialog():
     myGlobals.textbox.delete('1.0', tk.END)      #clear textbox
 
     ftypes = [('settings', '*.json')]
     filename = askopenfilename(filetypes = ftypes)
-    #filename = 'settings.json'  #debug
     if not filename : return None
+    
+    OpenSettings_Load(filename)
 
+
+
+def OpenSettings_Load(filename):
     myGlobals.textbox.insert(tk.END,'Reading settings from file "%s"...\n'%filename)
-
-    #https://docs.python.org/2.7/library/configparser.html#examples
-    #with open(filename, "r") as f: data = json.load(f)
 
     try:
         f = open(filename, "r")
@@ -1159,63 +1133,69 @@ def OpenSettings():
     sanity_check = False
     if ('info' in data) :
         if ('content' in data['info']) :
-            if (data['info']['content'] == 'settings') : sanity_check = True
-    
+            if (
+                (data['info']['program'] == 'CONVERTRON3000') &
+                (data['info']['content'] == 'settings')
+            ) : sanity_check = True
+
     if (sanity_check == False) :
         myGlobals.textbox.insert(tk.END,'Wrong file format.\n')
         return None
-    
-    if ('start address' in data['settings']) : myGlobals.user_start_address.set(data['settings']['start address'])
-    if ('start address checkbutton' in data['settings']) : myGlobals.user_start_address_checkbutton.set(data['settings']['start address checkbutton'])
-    if ('sharpness' in data['settings']) : myGlobals.user_sharpness.set(data['settings']['sharpness'])
-    if ('treshold' in data['settings']) : myGlobals.user_treshold.set(data['settings']['treshold'])
-    if ('saturation' in data['settings']) : myGlobals.user_color_saturation.set(data['settings']['saturation'])
-    if ('brightness' in data['settings']) : myGlobals.user_brightness.set(data['settings']['brightness'])
-    if ('contrast' in data['settings']) : myGlobals.user_contrast.set(data['settings']['contrast'])
-    if ('modes' in data['settings']) : myGlobals.user_modes.set(data['settings']['modes'])
-    if ('outputformat' in data['settings']) : myGlobals.user_outputformat.set(data['settings']['outputformat'])
-    if ('palette' in data['settings']) : myGlobals.user_palette.set(data['settings']['palette'])
-    if ('filename' in data['settings']) : myGlobals.user_filename_open_textvariable.set(data['settings']['filename'])
-    if ('effects blur' in data['settings']) : myGlobals.user_effects_blur.set(data['settings']['effects blur'])
-    if ('effects detail' in data['settings']) : myGlobals.user_effects_detail.set(data['settings']['effects detail'])
-    if ('effects enhance' in data['settings']) : myGlobals.user_effects_enhance.set(data['settings']['effects enhance'])
-    if ('effects enhance more' in data['settings']) : myGlobals.user_effects_enhance_more.set(data['settings']['effects enhance more'])
-    if ('effects smooth' in data['settings']) : myGlobals.user_effects_smooth.set(data['settings']['effects smooth'])
-    if ('effects smooth more' in data['settings']) : myGlobals.user_effects_smooth_more.set(data['settings']['effects smooth more'])
-    if ('effects sharpen' in data['settings']) : myGlobals.user_effects_sharpen.set(data['settings']['effects sharpen'])
-    if ('effects showclashes' in data['settings']) : myGlobals.user_effects_showClashes.set(data['settings']['effects showclashes'])
-    if ('gradient sceme' in data['settings']) : myGlobals.user_gradient_sceme.set(data['settings']['gradient sceme'])
-    if ('dithering' in data['settings']) : myGlobals.user_dithering.set(data['settings']['dithering'])
-    if ('background color' in data['settings']) : myGlobals.user_backgroundcolor.set(data['settings']['background color'])
-    
-    #myGlobals.textbox.insert(tk.END,"%d colors read.\n"%myGlobals.user_custom_gradient_sceme_size)
-    
+        
+    for my_key, my_value in myGlobals.settings.items() :
+        if (my_key in data['settings']) :
+            myGlobals.root.setvar(name=my_key, value=data['settings'][my_key])
+
     image_refresh()    
 
 
-def OpenGradient():
+def OpenGradient_FileDialog():
     myGlobals.textbox.delete('1.0', tk.END)      #clear textbox
 
     ftypes = [('gradient', '*.json')]
     filename = askopenfilename(filetypes = ftypes)
     if not filename : return None
+    
+    OpenGradient_Load(filename)
+
+
+
+def OpenGradient_Load(filename):
 
     myGlobals.textbox.insert(tk.END,"Reading custom gradient from file \"%s\"...\n"%filename)
 
-    #https://docs.python.org/2.7/library/configparser.html#examples
-    with open(filename, "r") as f: config = json.load(f)
+    try:
+        f = open(filename, "r")
+    except FileNotFoundError as err:
+        myGlobals.textbox.insert(tk.END,'FileNotFoundError: "%s"\n'%format(err))
+        #print("FileNotFoundError: {0}".format(err))
+        return None
+
+    data = json.load(f)
+
+    sanity_check = False
+    if ('info' in data) :
+        if ('content' in data['info']) :
+            if (
+                (data['info']['program'] == 'CONVERTRON3000') &
+                (data['info']['content'] == 'color gradient')
+            ) : sanity_check = True
+    
+    if (sanity_check == False) :
+        myGlobals.textbox.insert(tk.END,'Wrong file format.\n')
+        return None
 
     #get size
-    myGlobals.user_custom_gradient_sceme_size = int(config['size'])
+    myGlobals.user_custom_gradient_sceme_size = int(data['info']['size'])
 
     #apply values
     for a in range(0,len(myGlobals.user_custom_gradient_sceme)) :
-        myGlobals.user_custom_gradient_sceme[a] = int(config['color'+str(a)])
+        myGlobals.user_custom_gradient_sceme[a] = int(data['gradient']['color'+str(a)])
 
     myGlobals.textbox.insert(tk.END,"%d colors read.\n"%myGlobals.user_custom_gradient_sceme_size)
 
     """
-    for a in range(0,16) :
+    for a in range(0,myGlobals.C64_COLOR_AMOUNT) :
         myGlobals.textbox.insert(tk.END,"color %d: %d\n"%(a,myGlobals.user_custom_gradient_sceme[a]))
     """
     
@@ -1228,28 +1208,43 @@ def OpenGradient():
 
 
 
-def OpenFile():
-    #global user_filename_open
+def OpenImage_FileDialog():
     myGlobals.user_filename_open = ""
     
     ftypes = [('Image Files', '*.tif *.jpg *.png *.bmp *.gif')]
     myGlobals.user_filename_open = askopenfilename(filetypes = ftypes)
     if not myGlobals.user_filename_open : return None
     
-    loadFile(myGlobals.user_filename_open)
+    OpenImage_Load(myGlobals.user_filename_open)
 
 
 
-def loadFile(user_filename_open):    
+def OpenImage_Load(user_filename_open):    
     #print('load "%s"'%user_filename_open)
 
+    myGlobals.textbox.delete('1.0', tk.END)      #clear textbox
+    myGlobals.textbox.insert(tk.END,'Opening image "%s".\n' % user_filename_open)
+
+    try:
+        myGlobals.image_original = PilImage.open(user_filename_open)
+    except FileNotFoundError as err:
+        myGlobals.textbox.insert(tk.END,"FileNotFoundError: %s\n"%format(err))
+        print("FileNotFoundError: {0}".format(err))
+        return None
+
     myGlobals.user_filename_open_textvariable.set("\"..."+user_filename_open[-30:]+"\"")
-    load_image(user_filename_open)
-#    convert()    
+
+    myGlobals.image_original = myGlobals.image_original.resize((myGlobals.HIRES_WIDTH,myGlobals.HIRES_HEIGHT), resample=PilImage.NEAREST)
+    myGlobals.image_original = myGlobals.image_original.convert("RGB")
+    myGlobals.image_originalTk = ImageTk.PhotoImage(myGlobals.image_original)
+    myGlobals.label_original_image.configure(image=myGlobals.image_originalTk)
+    myGlobals.label_original_image.image = myGlobals.image_original # keep a reference!
+    image_refresh()
 
 
 
-def SaveFile():
+
+def SaveImage():
     myGlobals.textbox.delete('1.0', tk.END)      #clear textbox
 
     user_filename_save = ""
@@ -1295,56 +1290,31 @@ def SaveFile():
 
 
 
-def SaveFile_clash_json():
-    #user_filename_save_clash_json = args.clashes_json
-
+def SaveClash_JSON():
     myGlobals.textbox.delete('1.0', tk.END)      #clear textbox
 
     user_filename = asksaveasfilename(filetypes = [('json', '*.json')])
     if not user_filename : return None
 
-    write_settings_to_json_file(user_filename, myGlobals.color_clash_chars_xy)
+    write_color_clashes_to_json_file(user_filename, myGlobals.color_clash_chars_xy)
 
 
 def SaveSettings():
-    #user_filename_save_clash_json = args.settings_json
-
     myGlobals.textbox.delete('1.0', tk.END)      #clear textbox
 
     user_filename = asksaveasfilename(filetypes = [('json', '*.json')])
     #user_filename = 'settings.json' #debug
     if not user_filename : return None
 
-    data = {
-        'start address' : myGlobals.user_start_address.get(),
-        'start address checkbutton' : myGlobals.user_start_address_checkbutton.get(),
-        'sharpness' : myGlobals.user_sharpness.get(),
-        'treshold' : myGlobals.user_treshold.get(),
-        'saturation' : myGlobals.user_color_saturation.get(),
-        'brightness' : myGlobals.user_brightness.get(),
-        'contrast' : myGlobals.user_contrast.get(),
-        'modes' : myGlobals.user_modes.get(),
-        'outputformat' : myGlobals.user_outputformat.get(),
-        'palette' : myGlobals.user_palette.get(),
-        'filename' : myGlobals.user_filename_open_textvariable.get(),
-        'effects blur' : myGlobals.user_effects_blur.get(),
-        'effects detail' : myGlobals.user_effects_detail.get(),
-        'effects enhance' : myGlobals.user_effects_enhance.get(),
-        'effects enhance more' : myGlobals.user_effects_enhance_more.get(),
-        'effects smooth' : myGlobals.user_effects_smooth.get(),
-        'effects smooth more' : myGlobals.user_effects_smooth_more.get(),
-        'effects sharpen' : myGlobals.user_effects_sharpen.get(),
-        'effects showclashes' : myGlobals.user_effects_showClashes.get(),
-        'gradient sceme' : myGlobals.user_gradient_sceme.get(),
-        'dithering' : myGlobals.user_dithering.get(),
-        'background color' : myGlobals.user_backgroundcolor.get(),
-    }
+    data = {}
+    for my_key, my_value in myGlobals.settings.items() :
+        data.update({my_key: myGlobals.root.getvar(name=my_key)})
 
     write_settings_to_json_file(user_filename , data)
 
 
 
-def SaveFile_clash_image():
+def SaveClash_Image():
     #global user_filename_save_clash_image
     myGlobals.user_filename_save_clash_image = ""
 

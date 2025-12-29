@@ -1,19 +1,26 @@
 {
-    "size": "8",
-    "color0": 0,
-    "color1": 6,
-    "color2": 4,
-    "color3": 10,
-    "color4": 3,
-    "color5": 13,
-    "color6": 7,
-    "color7": 1,
-    "color8": 0,
-    "color9": 0,
-    "color10": 0,
-    "color11": 0,
-    "color12": 0,
-    "color13": 0,
-    "color14": 0,
-    "color15": 0
+    "info": {
+        "program": "CONVERTRON3000",
+        "version": "v1.34 [build 251225-195551]",
+        "content": "color gradient",
+        "size": 8
+    },
+    "gradient": {
+        "color0": 0,
+        "color1": 6,
+        "color2": 4,
+        "color3": 10,
+        "color4": 3,
+        "color5": 13,
+        "color6": 7,
+        "color7": 1,
+        "color8": 0,
+        "color9": 0,
+        "color10": 0,
+        "color11": 0,
+        "color12": 0,
+        "color13": 0,
+        "color14": 0,
+        "color15": 0
+    }
 }

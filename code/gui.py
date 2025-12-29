@@ -16,16 +16,16 @@ def create_drop_down_menu (
     filemenu = tk.Menu(menu)
     infomenu = tk.Menu(menu)
 
-    filemenu.add_command(label="open image...", command=action.OpenFile, underline=0, accelerator="Alt+O")
-    filemenu.add_command(label="save image...", command=action.SaveFile, underline=0, accelerator="Alt+S")
+    filemenu.add_command(label="open image...", command=action.OpenImage_FileDialog, underline=0, accelerator="Alt+O")
+    filemenu.add_command(label="save image...", command=action.SaveImage, underline=0, accelerator="Alt+S")
     filemenu.add_separator()
-    filemenu.add_command(label="open settings...", command=action.OpenSettings, underline=1, accelerator="Alt+P")
+    filemenu.add_command(label="open settings...", command=action.OpenSettings_FileDialog, underline=1, accelerator="Alt+P")
     filemenu.add_command(label="save settings...", command=action.SaveSettings, underline=1, accelerator="Alt+V")
     filemenu.add_separator()
-    filemenu.add_command(label="save color-clash image...", command=action.SaveFile_clash_image)
-    filemenu.add_command(label="save color-clash json...", command=action.SaveFile_clash_json)
+    filemenu.add_command(label="save color-clash image...", command=action.SaveClash_Image)
+    filemenu.add_command(label="save color-clash json...", command=action.SaveClash_JSON)
     filemenu.add_separator()
-    filemenu.add_command(label="open custom gradient...", command=action.OpenGradient)
+    filemenu.add_command(label="open custom gradient...", command=action.OpenGradient_FileDialog)
 #    filemenu.add_command(label="save custom gradient...", command=action.action_SaveGradient, underline=5, accelerator="Alt+H")
     filemenu.add_separator()
     filemenu.add_command(label="quit", command=root.quit, underline=0, accelerator="Alt+Q")
@@ -285,6 +285,8 @@ def create_gui_settings_mode (
 ) :
 #mode radiobuttons
 #http://effbot.org/tkinterbook/radiobutton.htm
+
+    #frame_border
     frame_border = tk.Frame(
         root,
         bg=myGlobals.BGCOLOR,
@@ -292,8 +294,13 @@ def create_gui_settings_mode (
     )
     frame_border.grid(
         row=_row,
-        column=_column
+        column=_column,
+        sticky=tk.N
     )
+    frame_border.grid_columnconfigure(0, weight=1)
+    frame_border.grid_rowconfigure(0, weight=1)
+
+    #frame_inner
     frame_inner = tk.Frame(
         frame_border,
         bg=myGlobals.BGCOLOR,
@@ -302,10 +309,11 @@ def create_gui_settings_mode (
         pady = myGlobals._pady,
         relief=tk.RAISED
         )
-    frame_inner.grid()
+    frame_inner.grid(sticky=tk.N)
     frame_inner.grid_columnconfigure(0, weight=1)
     frame_inner.grid_rowconfigure(0, weight=1)
 
+    #label
     _row = 0
     label = tk.Label(
         frame_inner,
@@ -319,8 +327,13 @@ def create_gui_settings_mode (
     label.grid(
         row=_row,
         column=1,
-        sticky=tk.W+tk.E
+        #sticky=tk.N+tk.S+tk.W+tk.E
     )
+    #label.grid_columnconfigure(0, weight=1)
+    #label.grid_rowconfigure(0, weight=1)
+    
+    
+    #radiobutton_user_mode
     MODES = [
             ("keep colors", "colors"),
             ("brightness palette", "palette"),
@@ -341,8 +354,10 @@ def create_gui_settings_mode (
         radiobutton_user_mode.grid(
             row=_row,
             column=1,
-            sticky=tk.W+tk.E
+            sticky=tk.N+tk.S+tk.W+tk.E
         )
+        #radiobutton_user_mode.grid_columnconfigure(0, weight=1)
+        #radiobutton_user_mode.grid_rowconfigure(0, weight=1)
 
 
 
@@ -359,7 +374,8 @@ def create_gui_backgroundcolor (
     )
     frame_border.grid(
         row=_row,
-        column=_column
+        column=_column,
+        sticky=tk.N
     )
     frame_inner = tk.Frame(
         frame_border,
@@ -370,8 +386,8 @@ def create_gui_backgroundcolor (
         relief=tk.RAISED
         )
     frame_inner.grid()
-    frame_inner.grid_columnconfigure(0, weight=1)
-    frame_inner.grid_rowconfigure(0, weight=1)
+    #frame_inner.grid_columnconfigure(0, weight=1)
+    #frame_inner.grid_rowconfigure(0, weight=1)
 
     _row = 0
     label = tk.Label(
@@ -459,6 +475,7 @@ def create_gui_palette_brightness_mode (
     _row,
     _column
 ) :
+    #frame_border
     frame_border = tk.Frame(
         root,
         bg=myGlobals.BGCOLOR,
@@ -466,8 +483,12 @@ def create_gui_palette_brightness_mode (
     )
     frame_border.grid(
         row=_row,
-        column=_column
+        column=_column,
+        sticky=tk.N
+
     )
+    
+    #frame_inner
     frame_inner = tk.Frame(
         frame_border,
         bg=myGlobals.BGCOLOR,
@@ -480,6 +501,7 @@ def create_gui_palette_brightness_mode (
     frame_inner.grid_columnconfigure(0, weight=1)
     frame_inner.grid_rowconfigure(0, weight=1)
 
+    #label
     label = tk.Label(
         frame_inner,
         bg=myGlobals.BGCOLOR,
@@ -496,6 +518,7 @@ def create_gui_palette_brightness_mode (
         columnspan=4
     )
 
+    #radiobutton_user_mode
     MODES = [
             ("purple", "purple", 1,0),
             ("brown", "brown", 2,0),
@@ -537,7 +560,8 @@ def create_gui_dithering (
     )
     frame_border.grid(
         row=_row,
-        column=_column
+        column=_column,
+        sticky=tk.N
     )
     frame_inner = tk.Frame(
         frame_border,
@@ -548,8 +572,8 @@ def create_gui_dithering (
         relief=tk.RAISED
         )
     frame_inner.grid()
-    frame_inner.grid_columnconfigure(0, weight=1)
-    frame_inner.grid_rowconfigure(0, weight=1)
+    #frame_inner.grid_columnconfigure(0, weight=1)
+    #frame_inner.grid_rowconfigure(0, weight=1)
 
     label = tk.Label(
         frame_inner,
@@ -678,8 +702,12 @@ def create_gui_settings_startaddress (
     )
     frame_border.grid(
         row=_row,
-        column=_column
+        column=_column,
+        sticky=tk.N
     )
+    #frame_border.grid_columnconfigure(0, weight=1)
+    #frame_border.grid_rowconfigure(0, weight=1)
+
     frame_inner = tk.Frame(
         frame_border,
         bg=myGlobals.BGCOLOR,
@@ -689,8 +717,8 @@ def create_gui_settings_startaddress (
         relief=tk.RAISED
         )
     frame_inner.grid()
-    frame_inner.grid_columnconfigure(0, weight=1)
-    frame_inner.grid_rowconfigure(0, weight=1)
+    #frame_inner.grid_columnconfigure(0, weight=1)
+    #frame_inner.grid_rowconfigure(0, weight=1)
     
     label_start_address_title = tk.Label(
         frame_inner,
@@ -751,7 +779,7 @@ def create_gui_filename (
     _row,
     _column
 ) :
-    
+    #frame_border
     frame_border = tk.Frame(
         root,
         bg=myGlobals.BGCOLOR,
@@ -759,8 +787,13 @@ def create_gui_filename (
     )
     frame_border.grid(
         row=_row,
-        column=_column
+        column=_column,
+        sticky=tk.N
     )
+    #frame_border.grid_columnconfigure(0, weight=1)
+    #frame_border.grid_rowconfigure(0, weight=1)
+
+    #frame_inner
     frame_inner = tk.Frame(
         frame_border,
         bg=myGlobals.BGCOLOR,
@@ -770,9 +803,11 @@ def create_gui_filename (
         relief=tk.RAISED
         )
     frame_inner.grid()
-    frame_inner.grid_columnconfigure(0, weight=1)
-    frame_inner.grid_rowconfigure(0, weight=1)
-    
+    #frame_inner.grid(sticky=tk.N+tk.S+tk.W+tk.E)
+    #frame_inner.grid_columnconfigure(0, weight=1)
+    #frame_inner.grid_rowconfigure(0, weight=1)
+   
+    #label_title
     label_title = tk.Label(
         frame_inner,
         bg=myGlobals.BGCOLOR,
@@ -780,6 +815,16 @@ def create_gui_filename (
         anchor='c',
         fg="#000088"
     )
+    #placement in grid layout
+    label_title.grid(
+        row=0,
+        column=0,
+        #sticky=tk.W+tk.E
+    )
+    #label_title.grid_columnconfigure(0, weight=1)
+    #label_title.grid_rowconfigure(0, weight=1)
+
+    #label_filename
     label_filename = tk.Label(
         frame_inner,
         bg=myGlobals.BGCOLOR,
@@ -787,17 +832,13 @@ def create_gui_filename (
         anchor='c'
     )
     #placement in grid layout
-    label_title.grid(
-        row=0,
-        column=0,
-        sticky=tk.W+tk.E
-    )
     label_filename.grid(
         row=1,
         column=0,
-        sticky=tk.W+tk.E
+        #sticky=tk.W+tk.E
     )
-
+    #label_filename.grid_columnconfigure(0, weight=1)
+    #label_filename.grid_rowconfigure(0, weight=1)
 
 
 
@@ -853,9 +894,7 @@ def create_gui_text (
     _row,
     _column
 ) :
-    #creation of elements
-    #global textbox
-
+    #frame_border
     frame_border = tk.Frame(
         root,
         bg=myGlobals.BGCOLOR,
@@ -863,8 +902,13 @@ def create_gui_text (
     )
     frame_border.grid(
         row=_row,
-        column=_column
+        column=_column,
+        sticky=tk.N+tk.S+tk.W+tk.E
     )
+    frame_border.grid_columnconfigure(0, weight=1)
+    frame_border.grid_rowconfigure(0, weight=1)
+
+    #frame_inner
     frame_inner = tk.Frame(
         frame_border,
         bg=myGlobals.BGCOLOR,
@@ -872,35 +916,36 @@ def create_gui_text (
         padx = myGlobals._padx,
         pady = myGlobals._pady,
         relief=tk.RAISED
-        )
-    frame_inner.grid()
+    )
+    frame_inner.grid(sticky=tk.N+tk.S+tk.W+tk.E)
     frame_inner.grid_columnconfigure(0, weight=1)
-    frame_inner.grid_rowconfigure(0, weight=1)
-
+    frame_inner.grid_rowconfigure(0, weight=0)  #row 0: label_textbox_text
+    frame_inner.grid_rowconfigure(1, weight=1)  #row 1: myGlobals.textbox
+    
+    #label_textbox_text
     label_textbox_text = tk.Label(
 		frame_inner,
         bg=myGlobals.BGCOLOR,
 		text="converter output",
         fg="#000088"
 	)
+    label_textbox_text.grid(
+        row=0,
+        column=0,
+        sticky=tk.N+tk.S+tk.W+tk.E
+    )
+
+    #myGlobals.textbox
     myGlobals.textbox = tk.Text(
         frame_inner,
         height=10,
         width=40
     )
-
-    #placement in grid layout
-    label_textbox_text.grid(
-        row=0,
-        column=0,
-        sticky=tk.W+tk.E
-    )
     myGlobals.textbox.grid(
         row=1,
         column=0,
-        sticky=tk.W+tk.E
+        sticky=tk.N+tk.S+tk.W+tk.E
     )
-
 
 
 
@@ -1073,52 +1118,49 @@ def create_gui_image_koala (
 
     
 def _start_gui() :
-    #main procedure
-    title_string = myGlobals.PROGNAME+" "+myGlobals.VERSION
-    myGlobals.root.title(title_string)
-    #print("%s %s *** by WolF"% (myGlobals.PROGNAME, myGlobals.VERSION))
-
+    myGlobals.root.title(myGlobals.PROGNAME+" "+myGlobals.VERSION)
     myGlobals.root.configure(background = myGlobals.BGCOLOR)
     myGlobals.root.iconphoto(False, tk.PhotoImage(file = myGlobals.RES_GFX_ICON))
 
-
-    myGlobals.root.grid_columnconfigure(0, weight=10)
-    myGlobals.root.grid_rowconfigure(0, weight=10)
-
+    myGlobals.root.columnconfigure(0, weight=0) #column 0: left
+    myGlobals.root.columnconfigure(1, weight=1) #column 1: middle
+    myGlobals.root.columnconfigure(2, weight=0) #column 2: right
+    myGlobals.root.grid_rowconfigure(0, weight=1)   #row 0
 
     frame_left = tk.Frame(myGlobals.root, bg=myGlobals.BGCOLOR)
     frame_left.grid(
         row=0,
         column=0,
-        sticky=tk.N
+        sticky=(tk.W)
     )
-    frame_left.grid_columnconfigure(0, weight=1)
-    frame_left.grid_rowconfigure(0, weight=1)
+    #frame_left.grid_columnconfigure(0, weight=0)
+    #frame_left.grid_rowconfigure(0, weight=0)
+
+
 
     frame_middle = tk.Frame(myGlobals.root, bg=myGlobals.BGCOLOR)
     frame_middle.grid(
         row=0,
         column=1,
-        sticky=tk.N
+        sticky=(tk.N,tk.S,tk.E,tk.W)
     )
     frame_middle.grid_columnconfigure(0, weight=1)
-    frame_middle.grid_rowconfigure(0, weight=1)
+
+
 
     frame_right = tk.Frame(myGlobals.root, bg=myGlobals.BGCOLOR)
     frame_right.grid(
         row=0,
         column=2,
-        sticky=tk.N
+        sticky=(tk.E)
     )
-    frame_right.grid_columnconfigure(0, weight=1)
-    frame_right.grid_rowconfigure(0, weight=1)
+    #frame_right.grid_columnconfigure(2, weight=0)
+    #frame_right.grid_rowconfigure(0, weight=0)
 
 
-    create_drop_down_menu(
-        myGlobals.root
-    )
 
 
+    ################################################################
     #frame_left elements
     create_gui_settings_outputformat(
         frame_left,
@@ -1130,7 +1172,6 @@ def _start_gui() :
         1,  #row
         0   #column
     )
-
     create_gui_action_buttons (
         frame_left,
         2,  #row
@@ -1149,47 +1190,60 @@ def _start_gui() :
     )
 
 
-    #frame_right elements
+    ################################################################
+    #frame_middle elements
     create_gui_filename(
         frame_middle,
         0,  #row
         0   #column
     )
+    frame_middle.grid_rowconfigure(0, weight=0)
+
     create_gui_settings_mode(
         frame_middle,
         1,  #row
         0   #column
     )
+    frame_middle.grid_rowconfigure(1, weight=0)
+
     create_gui_palette_brightness_mode(
         frame_middle,
         2,  #row
         0   #column
     )
+    frame_middle.grid_rowconfigure(2, weight=0)
+
     create_gui_dithering(
         frame_middle,
         3,  #row
         0   #column
     )
+    frame_middle.grid_rowconfigure(3, weight=0)
+
     create_gui_backgroundcolor(
         frame_middle,
         4,  #row
         0   #column
     )
+    frame_middle.grid_rowconfigure(4, weight=0)
+
     create_gui_settings_startaddress(
         frame_middle,
         5,  #row
         0   #column
     )
+    frame_middle.grid_rowconfigure(5, weight=0)
+
     create_gui_text(
         frame_middle,
         6,  #row
         0   #column
     )
+    frame_middle.grid_rowconfigure(6, weight=1)
 
 
-
-
-    #frame_middle elements
+    ################################################################
+    #frame_right elements
     create_gui_image_koala(
         frame_right,
         0,  #row
@@ -1205,9 +1259,14 @@ def _start_gui() :
         2,  #row
         0   #column
     )
+    
+    myGlobals.root.resizable(True, True)
+    #myGlobals.root.resizable(False, False)
 
 
-            
+    create_drop_down_menu(
+        myGlobals.root
+    )
 
     action.create_empty_images()
     

@@ -97,6 +97,45 @@ which I use # Using Convertron 3000</li>
 <li>optional: Check position of color-clashes.</li>
 <li>Save the resulting image.</li>
 </ul>
+<h2 id="shortcuts">shortcuts</h2>
+<table>
+<thead>
+<tr class="header">
+<th>key</th>
+<th>function</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>F1</td>
+<td>help</td>
+</tr>
+<tr class="even">
+<td>Alt-o</td>
+<td>open image</td>
+</tr>
+<tr class="odd">
+<td>Alt-s</td>
+<td>save image (koala or hires format)</td>
+</tr>
+<tr class="even">
+<td>Alt-c</td>
+<td>convert image</td>
+</tr>
+<tr class="odd">
+<td>Alt-p</td>
+<td>open settings</td>
+</tr>
+<tr class="even">
+<td>Alt-v</td>
+<td>save settings</td>
+</tr>
+<tr class="odd">
+<td>Alt-q</td>
+<td>quit</td>
+</tr>
+</tbody>
+</table>
 <h2 id="dithering">Dithering</h2>
 <p>As of now, Convertron3000 offers various dithering methods. As the
 PIL-library only implements “floyd-steinberg”-dithering, all other
@@ -173,8 +212,8 @@ under “open custom gradient”.</li>
 <li>1000 bytes raw “Video Matrix” (screen) data</li>
 </ul>
 <h1 id="commandline-options">Commandline options</h1>
-<pre><code>CONVERTRON3000 v1.33 [build 250322-030736] *** by fieserWolF
-usage: convertron.py [-h] [-i INPUT_IMAGE] [-c CLASHES_JSON] [-o CLASHES_IMAGE] [-d]
+<pre><code>CONVERTRON3000 v1.34 [build 251225-195551] *** by fieserWolF
+usage: convertron.py [-h] [-i INPUT_IMAGE] [-g FILE_GRADIENT] [-s FILE_SETTINGS] [-d]
 
 This program reads an image-file, lets the user adjust settings and converts it to a C64 koala or hires image.
 
@@ -182,27 +221,25 @@ options:
   -h, --help            show this help message and exit
   -i, --image INPUT_IMAGE
                         image file)
-  -c, --clashes CLASHES_JSON
-                        filename of report containing all color-clashes (in json-format (default=&quot;/tmp/color_clashes.json&quot;)
-  -o, --output CLASHES_IMAGE
-                        filename of color-clash image (default=&quot;/tmp/color_clashes.png&quot;)
+  -g, --gradient FILE_GRADIENT
+                        filename of custom gradient file (JSON) to be loaded
+  -s, --settings FILE_SETTINGS
+                        filename of settings file (JSON) to be loaded
   -d, --debug           show color-clashes on consule
 
-Example: ./convertron.py -i image.png -c /tmp/clashes.json -d</code></pre>
+Example: ./convertron.py -i image.png -g 8color_gradient-brown.json -s settings.json -d</code></pre>
 <h1 id="getting-started">Getting Started</h1>
 <p>Convertron3000 comes in two flavors:</p>
 <ul>
-<li>standalone executable for 64-bit systems Linux, MacOS/Darwin and
-Windows (see <a
+<li>Python3 script if you have python3 installed on your system
+(preferred method)</li>
+<li>executable for Linux and Windows (see <a
 href="https://github.com/fieserWolF/convertron3000/releases">releases</a>)</li>
-<li>Python3 script</li>
 </ul>
-<h2 id="run-the-standalone-executable">Run the standalone
-executable</h2>
-<p>Just download your bundle at <a
-href="https://github.com/fieserWolF/convertron3000/releases">releases</a>
-and enjoy. Keep in mind that only 64bit systems are supported as I could
-not find a 32bit system to generate the bundle.</p>
+<h2 id="run-the-executable">Run the executable</h2>
+<p>Just download your zip-bundle at <a
+href="https://github.com/fieserWolF/convertron3000/releases">releases</a>,
+extract it to a folder of your choice and enjoy.</p>
 <h3 id="note-for-windows-users">Note for Windows users</h3>
 <p>If some antivirus scanner puts Convertron3000 into quarantine because
 it suspects a trojan or virus, simply put it out there again. It isn`t
@@ -211,9 +248,12 @@ Unfortunately, the PyInstaller bootloader triggers a false alarm on some
 systems. I even tried my best and re-compiled the PyInstaller bootloader
 so that this should not happen anymore. Keep your fingers crossed ;)</p>
 <h3 id="note-for-macos-users">Note for MacOS users</h3>
-<p>Your system might complain that the code is not signed by a
-certificated developer. Well, I am not, so I signed the program on my
-own.</p>
+<p>In <a
+href="https://github.com/fieserWolF/convertron3000/releases">releases</a>
+you also find older versions of Convertron 3000 compiled as standalone
+executables. You may use this, but your system might complain that the
+code is not signed by a certificated developer. Well, I am not, so I
+signed the program on my own.</p>
 <pre><code>&quot;Convertron3000&quot; can`t be opened because it is from an unidentified developer.</code></pre>
 <p>You need to right-click or Control-click the app and select
 “Open”.</p>
@@ -248,7 +288,8 @@ help, please, contact me:</p>
 <p><a
 href="http://csdb.dk/scener/?id=3623">http://csdb.dk/scener/?id=3623</a>
 or <a href="wolf@abyss-connection.de">wolf@abyss-connection.de</a></p>
-<h2 id="changes-in-1.34">Changes in 1.34</h2>
+<h2 id="changes-in-1.34-on-dream210-party-2025">Changes in 1.34 (on
+Dream210 Party 2025)</h2>
 <p>(next release candidate)</p>
 <ul>
 <li>all settings can now be written to a file and restored to a file
@@ -257,6 +298,7 @@ or <a href="wolf@abyss-connection.de">wolf@abyss-connection.de</a></p>
 are closer by now)</li>
 <li>rewritten the whole code, split up into parts</li>
 <li>rearranged the documentation</li>
+<li>responsive GUI</li>
 <li>bug fix: proper file-not-found handling when opening images</li>
 <li>bug fix: fixed crash when not finding reasonable color replacement
 in hires mode (thanks slesinger for the bug report)</li>
