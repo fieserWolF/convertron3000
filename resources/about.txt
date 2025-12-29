@@ -260,8 +260,6 @@ http://csdb.dk/scener/?id=3623 or
 Changes in 1.34 (on Dream210 Party 2025)
 ----------------------------------------
 
-(next release candidate)
-
 -  all settings can now be written to a file and restored to a file
    (json format)
 -  rearranged the main layout to simplify the workflow (all controls are

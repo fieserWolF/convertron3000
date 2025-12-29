@@ -199,8 +199,6 @@ or
 
 ## Changes in 1.34 (on Dream210 Party 2025)
 
-(next release candidate)
-
 - all settings can now be written to a file and restored to a file (json format)
 - rearranged the main layout to simplify the workflow (all controls are closer by now)
 - rewritten the whole code, split up into parts
