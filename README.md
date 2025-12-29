@@ -107,7 +107,7 @@ The hires bitmap is stored in the widely-spread Advanced Art Studio (.art) forma
 
 # Commandline options
 
-	CONVERTRON3000 v1.34 [build 251225-195551] *** by fieserWolF
+	CONVERTRON3000 v1.34 [build 251229-205604] *** by fieserWolF
 	usage: convertron.py [-h] [-i INPUT_IMAGE] [-g FILE_GRADIENT] [-s FILE_SETTINGS] [-d]
 
 	This program reads an image-file, lets the user adjust settings and converts it to a C64 koala or hires image.
