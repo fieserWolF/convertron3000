@@ -26,10 +26,8 @@ For Python3, Tcl/Tk and other used source licenses see file "LICENSE_OTHERS".
 """
 
 
+
 import code.main as main
-
-
-
 
 if __name__ == '__main__':
     main._main_procedure()

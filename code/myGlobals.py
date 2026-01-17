@@ -6,6 +6,7 @@ import PIL.Image as PilImage    #we need another name, as it collides with tkint
 
 
 
+
 #global constants
 def _global_constants():
         return None
@@ -305,13 +306,23 @@ user_filename_open_textvariable.set("none")
 convertbutton_text.set("convert\nAlt+C")
 
 textbox = tk.Text()
-label_original_image = tk.Label()
-label_preview_image = tk.Label()
-label_koala_image = tk.Label()
-image_original = PilImage.new("RGB", (HIRES_WIDTH,HIRES_HEIGHT), "black")
-image_preview = PilImage.new("RGB", (HIRES_WIDTH,HIRES_HEIGHT), "black")
-image_koala = PilImage.new("RGBA", (HIRES_WIDTH,HIRES_HEIGHT), "black")
-image_preview_convert = PilImage.new("RGB", (KOALA_WIDTH,KOALA_HEIGHT), "black")
+label_original_image = None #tk.Label()
+label_preview_image = None  #tk.Label()
+label_koala_image = None    #tk.Label()
+image_original = None   #PilImage.new("RGB", (HIRES_WIDTH,HIRES_HEIGHT), "black")
+#image_preview = None    #PilImage.new("RGB", (HIRES_WIDTH,HIRES_HEIGHT), "black")
+image_koala = None  #PilImage.new("RGBA", (HIRES_WIDTH,HIRES_HEIGHT), "black")
+image_preview_convert = None    #PilImage.new("RGB", (KOALA_WIDTH,KOALA_HEIGHT), "black")
+image_koala_new = None
+
+CANVAS_SAFETY_BORDER = 10
+#canvas_koala_width = 1
+#canvas_koala_height = 1
+canvas_preview_width = KOALA_WIDTH*2
+canvas_preview_height = KOALA_HEIGHT
+#canvas_original_width = 1
+#canvas_original_height = 1
+
 
 koala_bitmap=[None]*8000
 koala_col12=[None]*1000

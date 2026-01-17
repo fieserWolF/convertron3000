@@ -9,6 +9,8 @@ import tkinter as tk
 import argparse
 
 
+
+
 def _main_procedure() :
     #global args
     print("%s %s *** by fieserWolF" % (myGlobals.PROGNAME, myGlobals.VERSION))

@@ -966,8 +966,12 @@ def create_gui_image_original (
     )
     frame_border.grid(
         row=_row,
-        column=_column
+        column=_column,
+        sticky=tk.N+tk.S+tk.W+tk.E
     )
+    frame_border.grid_columnconfigure(0, weight=1)
+    frame_border.grid_rowconfigure(0, weight=1)
+
     frame_inner = tk.Frame(
         frame_border,
         bg=myGlobals.BGCOLOR,
@@ -976,10 +980,12 @@ def create_gui_image_original (
         pady = myGlobals._pady,
         relief=tk.RAISED
         )
-    frame_inner.grid()
+    frame_inner.grid(sticky=tk.N+tk.S+tk.W+tk.E)
     frame_inner.grid_columnconfigure(0, weight=1)
-    frame_inner.grid_rowconfigure(0, weight=1)
-    
+    frame_inner.grid_rowconfigure(0, weight=0)  #label
+    frame_inner.grid_rowconfigure(1, weight=1)  #image
+
+
     #creation of elements
     label_original_text = tk.Label(
 		frame_inner,
@@ -987,22 +993,27 @@ def create_gui_image_original (
 		text="original",
         fg="#000088"
 	)
+    label_original_text.grid(
+        row=0,
+        column=0,
+        sticky=tk.N+tk.W+tk.E
+    )
+
     myGlobals.label_original_image = tk.Label(
         frame_inner,
         bg=myGlobals.BGCOLOR
     )
-	
-    #placement in grid layout
-    label_original_text.grid(
-        row=0,
-        column=0,
-        sticky=tk.W+tk.E
-    )
     myGlobals.label_original_image.grid(
         row=1,
         column=0,
-        sticky=tk.W+tk.E
+        sticky=tk.N+tk.S+tk.W+tk.E
     )
+    myGlobals.label_original_image.grid_columnconfigure(0, weight=1)
+    myGlobals.label_original_image.grid_rowconfigure(0, weight=1)
+    
+    #https://www.youtube.com/watch?v=oVueT2pkcOw
+    myGlobals.label_original_image.bind("<Configure>", action.redraw_original_image)
+
 
 
 
@@ -1020,8 +1031,12 @@ def create_gui_image_preview (
     )
     frame_border.grid(
         row=_row,
-        column=_column
+        column=_column,
+        sticky=tk.N+tk.S+tk.W+tk.E
     )
+    frame_border.grid_columnconfigure(0, weight=1)
+    frame_border.grid_rowconfigure(0, weight=1)
+
     frame_inner = tk.Frame(
         frame_border,
         bg=myGlobals.BGCOLOR,
@@ -1030,9 +1045,10 @@ def create_gui_image_preview (
         pady = myGlobals._pady,
         relief=tk.RAISED
         )
-    frame_inner.grid()
+    frame_inner.grid(sticky=tk.N+tk.S+tk.W+tk.E)
     frame_inner.grid_columnconfigure(0, weight=1)
-    frame_inner.grid_rowconfigure(0, weight=1)
+    frame_inner.grid_rowconfigure(0, weight=0)  #label
+    frame_inner.grid_rowconfigure(1, weight=1)  #image
     
     #creation of elements
     label_preview_text = tk.Label(
@@ -1041,22 +1057,25 @@ def create_gui_image_preview (
 		text="preview",
         fg="#000088"
 	)
+    label_preview_text.grid(
+        row=0,
+        column=0,
+        sticky=tk.N+tk.W+tk.E
+    )
+
     myGlobals.label_preview_image = tk.Label(
         frame_inner,
         bg=myGlobals.BGCOLOR
     )
-	
-    #placement in grid layout
-    label_preview_text.grid(
-        row=0,
-        column=0,
-        sticky=tk.W+tk.E
-    )
     myGlobals.label_preview_image.grid(
         row=1,
         column=0,
-        sticky=tk.W+tk.E
+        sticky=tk.N+tk.S+tk.W+tk.E
     )
+
+    #https://www.youtube.com/watch?v=oVueT2pkcOw
+    #frame_border.bind("<Configure>", action.redraw_preview_image)
+    myGlobals.label_preview_image.bind("<Configure>", action.redraw_preview_image)
 
 
 
@@ -1075,8 +1094,12 @@ def create_gui_image_koala (
     )
     frame_border.grid(
         row=_row,
-        column=_column
+        column=_column,
+        sticky=tk.N+tk.S+tk.W+tk.E
     )
+    frame_border.grid_columnconfigure(0, weight=1)
+    frame_border.grid_rowconfigure(0, weight=1)
+
     frame_inner = tk.Frame(
         frame_border,
         bg=myGlobals.BGCOLOR,
@@ -1085,9 +1108,10 @@ def create_gui_image_koala (
         pady = myGlobals._pady,
         relief=tk.RAISED
         )
-    frame_inner.grid()
+    frame_inner.grid(sticky=tk.N+tk.S+tk.W+tk.E)
     frame_inner.grid_columnconfigure(0, weight=1)
-    frame_inner.grid_rowconfigure(0, weight=1)
+    frame_inner.grid_rowconfigure(0, weight=0)  #label
+    frame_inner.grid_rowconfigure(1, weight=1)  #image
     
     #creation of elements
     label_koala_text = tk.Label(
@@ -1096,22 +1120,25 @@ def create_gui_image_koala (
 		text="output",
         fg="#000088"
 	)
+    label_koala_text.grid(
+        row=0,
+        column=0,
+        sticky=tk.N+tk.W+tk.E
+    )
+
     myGlobals.label_koala_image = tk.Label(
         frame_inner,
         bg=myGlobals.BGCOLOR
     )
-	
-    #placement in grid layout
-    label_koala_text.grid(
-        row=0,
-        column=0,
-        sticky=tk.W+tk.E
-    )
     myGlobals.label_koala_image.grid(
         row=1,
         column=0,
-        sticky=tk.W+tk.E
+        sticky=tk.N+tk.S+tk.W+tk.E
     )
+    
+    #https://www.youtube.com/watch?v=oVueT2pkcOw
+    myGlobals.label_koala_image.bind("<Configure>", action.redraw_koala_image)
+
 
 
 
@@ -1123,8 +1150,8 @@ def _start_gui() :
     myGlobals.root.iconphoto(False, tk.PhotoImage(file = myGlobals.RES_GFX_ICON))
 
     myGlobals.root.columnconfigure(0, weight=0) #column 0: left
-    myGlobals.root.columnconfigure(1, weight=1) #column 1: middle
-    myGlobals.root.columnconfigure(2, weight=0) #column 2: right
+    myGlobals.root.columnconfigure(1, weight=0) #column 1: middle
+    myGlobals.root.columnconfigure(2, weight=1) #column 2: right
     myGlobals.root.grid_rowconfigure(0, weight=1)   #row 0
 
     frame_left = tk.Frame(myGlobals.root, bg=myGlobals.BGCOLOR)
@@ -1144,7 +1171,7 @@ def _start_gui() :
         column=1,
         sticky=(tk.N,tk.S,tk.E,tk.W)
     )
-    frame_middle.grid_columnconfigure(0, weight=1)
+    #frame_middle.grid_columnconfigure(0, weight=1)
 
 
 
@@ -1152,10 +1179,10 @@ def _start_gui() :
     frame_right.grid(
         row=0,
         column=2,
-        sticky=(tk.E)
+        sticky=(tk.N,tk.S,tk.E,tk.W)
     )
-    #frame_right.grid_columnconfigure(2, weight=0)
-    #frame_right.grid_rowconfigure(0, weight=0)
+    frame_right.grid_columnconfigure(0, weight=1)
+    frame_right.grid_rowconfigure(0, weight=1)
 
 
 
@@ -1249,16 +1276,19 @@ def _start_gui() :
         0,  #row
         0   #column
     )
+    frame_right.grid_rowconfigure(0, weight=1)
     create_gui_image_preview(
         frame_right,
         1,  #row
         0   #column
     )
+    frame_right.grid_rowconfigure(1, weight=1)
     create_gui_image_original(
         frame_right,
         2,  #row
         0   #column
     )
+    frame_right.grid_rowconfigure(2, weight=1)
     
     myGlobals.root.resizable(True, True)
     #myGlobals.root.resizable(False, False)

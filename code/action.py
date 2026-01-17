@@ -42,7 +42,30 @@ hitherdither_order=8  #2,4,8,16,32,64,128
 
 
 
+def redraw_koala_image(event) :
+    #print('action.redraw_koala_image() called.')
+    #print('%dx%d'%(event.width,event.height))
+    #myGlobals.canvas_koala_width = event.width-myGlobals.CANVAS_SAFETY_BORDER
+    #myGlobals.canvas_koala_height = event.height-myGlobals.CANVAS_SAFETY_BORDER
+    #image_update_dimensions_koala()
+    return None
 
+def redraw_preview_image(event) :
+    #print('action.redraw_preview_image() called.')
+    #print('%dx%d'%(event.width,event.height))
+    myGlobals.canvas_preview_width = event.width-myGlobals.CANVAS_SAFETY_BORDER
+    myGlobals.canvas_preview_height = event.height-myGlobals.CANVAS_SAFETY_BORDER
+    image_update_dimensions_preview()
+    image_update_dimensions_koala()
+    image_update_dimensions_original()
+
+def redraw_original_image(event) :
+    #print('action.redraw_original_image() called.')
+    #print('%dx%d'%(event.width,event.height))
+    #myGlobals.canvas_original_width = event.width-myGlobals.CANVAS_SAFETY_BORDER
+    #myGlobals.canvas_original_height = event.height-myGlobals.CANVAS_SAFETY_BORDER
+    #image_update_dimensions_original()
+    return None
 
 
 
@@ -1058,17 +1081,40 @@ def convert():
     prepare_image_color_clashes()
 
     if (myGlobals.user_effects_showClashes.get() == 0) :
-        image_koala_new = myGlobals.image_koala
+        myGlobals.image_koala_new = myGlobals.image_koala
     else :
-        image_koala_new = myGlobals.image_clashes
+        myGlobals.image_koala_new = myGlobals.image_clashes
 
-    #image_koala_new = show_color_clashes()
-    image_koalaTk = ImageTk.PhotoImage(image_koala_new)
+    image_update_dimensions_koala()
+    """
+    image_koalaTk = ImageTk.PhotoImage(myGlobals.image_koala_new)
+    myGlobals.label_koala_image.configure(image=image_koalaTk)
+    myGlobals.label_koala_image.image = image_koalaTk # keep a reference!
+    """
+    myGlobals.convertbutton_text.set("convert\nAlt+C")
+
+
+
+def image_update_dimensions_koala():
+    #scale image_koala to canvas_preview_width x canvas_preview_height dimensions
+    image_koalaTk = ImageTk.PhotoImage(myGlobals.image_koala_new.resize((myGlobals.canvas_preview_width,myGlobals.canvas_preview_height), resample=PilImage.NEAREST))
     myGlobals.label_koala_image.configure(image=image_koalaTk)
     myGlobals.label_koala_image.image = image_koalaTk # keep a reference!
 
-    myGlobals.convertbutton_text.set("convert\nAlt+C")
 
+def image_update_dimensions_preview():
+    #scale image_preview to canvas_preview_width x canvas_preview_height dimensions
+    #myGlobals.image_preview = myGlobals.image_preview_convert
+    #myGlobals.image_previewTk = ImageTk.PhotoImage(myGlobals.image_preview.resize((myGlobals.canvas_preview_width,myGlobals.canvas_preview_height), resample=PilImage.NEAREST))
+    myGlobals.image_previewTk = ImageTk.PhotoImage(myGlobals.image_preview_convert.resize((myGlobals.canvas_preview_width,myGlobals.canvas_preview_height), resample=PilImage.NEAREST))
+    myGlobals.label_preview_image.configure(image=myGlobals.image_previewTk)
+    myGlobals.label_preview_image.image = myGlobals.image_previewTk # keep a reference!
+
+def image_update_dimensions_original():
+    #scale image_original to canvas_preview_width x canvas_preview_height dimensions
+    image_koalaTk = ImageTk.PhotoImage(myGlobals.image_original.resize((myGlobals.canvas_preview_width,myGlobals.canvas_preview_height), resample=PilImage.NEAREST))
+    myGlobals.label_original_image.configure(image=image_koalaTk)
+    myGlobals.label_original_image.image = image_koalaTk # keep a reference!
 
 
 def image_refresh():
@@ -1085,18 +1131,31 @@ def image_refresh():
             myGlobals.image_preview_convert = myGlobals.image_preview_convert.resize((myGlobals.KOALA_WIDTH,myGlobals.KOALA_HEIGHT), resample=PilImage.NEAREST)
     myGlobals.image_preview_convert = image_quantize_c64_colors(myGlobals.image_preview_convert)
 
+    image_update_dimensions_preview()
+
+    """
     #prepare image_preview (this image will only be seen in preview window)
     if (myGlobals.user_outputformat.get() == "koala") :
-        myGlobals.image_preview = myGlobals.image_preview_convert.resize((myGlobals.HIRES_WIDTH,myGlobals.HIRES_HEIGHT), resample=PilImage.NEAREST)
+        #myGlobals.image_preview = myGlobals.image_preview_convert.resize((myGlobals.HIRES_WIDTH,myGlobals.HIRES_HEIGHT), resample=PilImage.NEAREST)
+        myGlobals.image_preview = myGlobals.image_preview_convert.resize((myGlobals.canvas_preview_width,myGlobals.canvas_preview_height), resample=PilImage.NEAREST)
     if (myGlobals.user_outputformat.get() == "hires") :
-        myGlobals.image_preview = myGlobals.image_preview_convert
+        #myGlobals.image_preview = myGlobals.image_preview_convert
+        myGlobals.image_preview = myGlobals.image_preview_convert.resize((myGlobals.canvas_preview_width,myGlobals.canvas_preview_height), resample=PilImage.NEAREST)
 
     myGlobals.image_previewTk = ImageTk.PhotoImage(myGlobals.image_preview)
     myGlobals.label_preview_image.configure(image=myGlobals.image_previewTk)
     myGlobals.label_preview_image.image = myGlobals.image_previewTk # keep a reference!
-
+    """
+    
     #convert()      #converting every time the image is refreshed: takes a lot of time and cpu power
 
+    """
+    print( '%dx%d' %(
+        myGlobals.label_original_image.winfo_reqwidth(),
+        myGlobals.label_original_image.winfo_reqheight()
+    )
+    )
+    """
 	
 	
 

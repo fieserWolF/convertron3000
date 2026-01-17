@@ -212,9 +212,6 @@ You need to right-click or Control-click the app and select “Open”.
 Run the Python3 script directly
 -------------------------------
 
-Download *convertron.py* and the whole *resource* - directory into the
-same folder on your computer.
-
 Prerequisites
 ~~~~~~~~~~~~~
 
@@ -230,7 +227,9 @@ Normally, you would use pip like this:
 
 ::
 
-   pip3 install tk pillow argparse git+https://www.github.com/hbldh/hitherdither
+   pip3 install pillow argparse git+https://www.github.com/hbldh/hitherdither
+
+You might need to install git (apt install git) first.
 
 On my Debian GNU/Linux machine I use apt-get to install everything
 needed:
@@ -240,6 +239,13 @@ needed:
    apt update
    apt install python3 python3-tk python3-pil python3-pil.imagetk
    pip3 install git+https://www.github.com/hbldh/hitherdither
+
+Download Convertron3000
+~~~~~~~~~~~~~~~~~~~~~~~
+
+-  Go to https://github.com/fieserWolF/convertron3000.
+-  Click on the green “Code” button and “Download ZIP”.
+-  Extract the downloaded ZIP-file to any folder.
 
 Changelog
 =========
@@ -256,6 +262,14 @@ help, please, contact me:
 
 http://csdb.dk/scener/?id=3623 or
 `wolf@abyss-connection.de <wolf@abyss-connection.de>`__
+
+Changes in 1.35
+---------------
+
+(next release candidate)
+
+-  resizable image windows
+-  bug fixes
 
 Changes in 1.34 (on Dream210 Party 2025)
 ----------------------------------------
@@ -343,7 +357,7 @@ License
 
 *Convertron3000 is a graphics converter for Commodore 64 computers.*
 
-*Copyright (C) 2025 fieserWolF / Abyss-Connection*
+*Copyright (C) 2026 fieserWolF / Abyss-Connection*
 
 This program is free software: you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the

@@ -154,8 +154,6 @@ You need to right-click or Control-click the app and select “Open”.
 
 ## Run the Python3 script directly
 
-Download _convertron.py_ and the whole _resource_ - directory into the same folder on your computer.
-
 ### Prerequisites
 
 At least this is needed to run the script directly:
@@ -169,8 +167,10 @@ At least this is needed to run the script directly:
 
 Normally, you would use pip like this:
 ```
-pip3 install tk pillow argparse git+https://www.github.com/hbldh/hitherdither
+pip3 install pillow argparse git+https://www.github.com/hbldh/hitherdither
 ```
+You might need to install git (apt install git) first.
+
 
 On my Debian GNU/Linux machine I use apt-get to install everything needed:
 ```
@@ -178,6 +178,14 @@ apt update
 apt install python3 python3-tk python3-pil python3-pil.imagetk
 pip3 install git+https://www.github.com/hbldh/hitherdither
 ```
+
+
+### Download Convertron3000
+
+* Go to [https://github.com/fieserWolF/convertron3000](https://github.com/fieserWolF/convertron3000).
+* Click on the green "Code" button and "Download ZIP".
+* Extract the downloaded ZIP-file to any folder.
+
 
 
 # Changelog
@@ -195,6 +203,14 @@ If you have a feature request, a bug report or if you want to offer help, please
 or
 [wolf@abyss-connection.de](wolf@abyss-connection.de)
 
+
+
+## Changes in 1.35
+
+(next release candidate)
+
+- resizable image windows
+- bug fixes
 
 
 ## Changes in 1.34 (on Dream210 Party 2025)
@@ -275,7 +291,7 @@ or
 
 _Convertron3000 is a graphics converter for Commodore 64 computers._
 
-_Copyright (C) 2025 fieserWolF / Abyss-Connection_
+_Copyright (C) 2026 fieserWolF / Abyss-Connection_
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
