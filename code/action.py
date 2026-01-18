@@ -53,8 +53,19 @@ def redraw_koala_image(event) :
 def redraw_preview_image(event) :
     #print('action.redraw_preview_image() called.')
     #print('%dx%d'%(event.width,event.height))
-    myGlobals.canvas_preview_width = event.width-myGlobals.CANVAS_SAFETY_BORDER
-    myGlobals.canvas_preview_height = event.height-myGlobals.CANVAS_SAFETY_BORDER
+    my_width = event.width-myGlobals.CANVAS_SAFETY_BORDER
+    my_height = event.height-myGlobals.CANVAS_SAFETY_BORDER
+    
+    #get proper aspect
+    if ( (my_width/my_height) <= 1.6 ) :
+        #my_height = int(my_width / 1.6)
+        my_height = (my_width / 1.6)
+    else :
+        #my_width = int(my_height * 1.6)
+        my_width = (my_height * 1.6)
+    
+    myGlobals.canvas_preview_width = int(my_width)  #int() important! ImageTk.PhotoImage resize hangs with float! bug in PIL.Image.Image ?
+    myGlobals.canvas_preview_height = int(my_height)  #int() important! ImageTk.PhotoImage resize hangs with float! bug in PIL.Image.Image ?
     image_update_dimensions_preview()
     image_update_dimensions_koala()
     image_update_dimensions_original()
@@ -1095,6 +1106,8 @@ def convert():
 
 
 
+
+
 def image_update_dimensions_koala():
     #scale image_koala to canvas_preview_width x canvas_preview_height dimensions
     image_koalaTk = ImageTk.PhotoImage(myGlobals.image_koala_new.resize((myGlobals.canvas_preview_width,myGlobals.canvas_preview_height), resample=PilImage.NEAREST))
@@ -1132,20 +1145,6 @@ def image_refresh():
     myGlobals.image_preview_convert = image_quantize_c64_colors(myGlobals.image_preview_convert)
 
     image_update_dimensions_preview()
-
-    """
-    #prepare image_preview (this image will only be seen in preview window)
-    if (myGlobals.user_outputformat.get() == "koala") :
-        #myGlobals.image_preview = myGlobals.image_preview_convert.resize((myGlobals.HIRES_WIDTH,myGlobals.HIRES_HEIGHT), resample=PilImage.NEAREST)
-        myGlobals.image_preview = myGlobals.image_preview_convert.resize((myGlobals.canvas_preview_width,myGlobals.canvas_preview_height), resample=PilImage.NEAREST)
-    if (myGlobals.user_outputformat.get() == "hires") :
-        #myGlobals.image_preview = myGlobals.image_preview_convert
-        myGlobals.image_preview = myGlobals.image_preview_convert.resize((myGlobals.canvas_preview_width,myGlobals.canvas_preview_height), resample=PilImage.NEAREST)
-
-    myGlobals.image_previewTk = ImageTk.PhotoImage(myGlobals.image_preview)
-    myGlobals.label_preview_image.configure(image=myGlobals.image_previewTk)
-    myGlobals.label_preview_image.image = myGlobals.image_previewTk # keep a reference!
-    """
     
     #convert()      #converting every time the image is refreshed: takes a lot of time and cpu power
 
