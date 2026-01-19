@@ -59,6 +59,15 @@ def _main_procedure() :
         print('%s : %s' % (my_key, myGlobals.root.getvar(name=my_key)))
     """
 
+    #print('-------------------')
+    #https://stackoverflow.com/questions/27581864/tkinters-event-generate-command-ignored
+    #myGlobals.label_koala_image.event_generate("<Configure>");
+    #myGlobals.label_original_image.event_generate("<Configure>");
+    #myGlobals.label_preview_image.event_generate("<<Configure>>");
+    #print('-------------------')
+
+    #action.convert()
+    #action.image_update_dimensions_original()
 
     tk.mainloop()
 

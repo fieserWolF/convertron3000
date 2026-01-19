@@ -1012,7 +1012,7 @@ def create_gui_image_original (
     myGlobals.label_original_image.grid_rowconfigure(0, weight=1)
     
     #https://www.youtube.com/watch?v=oVueT2pkcOw
-    myGlobals.label_original_image.bind("<Configure>", action.redraw_original_image)
+    myGlobals.label_original_image.bind("<Configure>", action.resize_label_original_image)
 
 
 
@@ -1065,7 +1065,8 @@ def create_gui_image_preview (
 
     myGlobals.label_preview_image = tk.Label(
         frame_inner,
-        bg=myGlobals.BGCOLOR
+        bg=myGlobals.BGCOLOR,
+        width=(myGlobals.KOALA_WIDTH*2)+myGlobals.CANVAS_SAFETY_BORDER
     )
     myGlobals.label_preview_image.grid(
         row=1,
@@ -1074,8 +1075,8 @@ def create_gui_image_preview (
     )
 
     #https://www.youtube.com/watch?v=oVueT2pkcOw
-    #frame_border.bind("<Configure>", action.redraw_preview_image)
-    myGlobals.label_preview_image.bind("<Configure>", action.redraw_preview_image)
+    #frame_border.bind("<Configure>", action.resize_label_preview_image)
+    myGlobals.label_preview_image.bind("<Configure>", action.resize_label_preview_image)
 
 
 
@@ -1137,8 +1138,7 @@ def create_gui_image_koala (
     )
     
     #https://www.youtube.com/watch?v=oVueT2pkcOw
-    myGlobals.label_koala_image.bind("<Configure>", action.redraw_koala_image)
-
+    myGlobals.label_koala_image.bind("<Configure>", action.resize_label_koala_image)
 
 
 
@@ -1158,7 +1158,7 @@ def _start_gui() :
     frame_left.grid(
         row=0,
         column=0,
-        sticky=(tk.W)
+        sticky=tk.N
     )
     #frame_left.grid_columnconfigure(0, weight=0)
     #frame_left.grid_rowconfigure(0, weight=0)
@@ -1169,7 +1169,7 @@ def _start_gui() :
     frame_middle.grid(
         row=0,
         column=1,
-        sticky=(tk.N,tk.S,tk.E,tk.W)
+        sticky=tk.N+tk.S
     )
     #frame_middle.grid_columnconfigure(0, weight=1)
 

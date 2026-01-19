@@ -207,10 +207,8 @@ or
 
 ## Changes in 1.35
 
-(next release candidate)
-
 - resizable image windows
-- bug fixes
+- various bug fixes
 
 
 ## Changes in 1.34 (on Dream210 Party 2025)

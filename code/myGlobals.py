@@ -243,7 +243,6 @@ def _global_variables():
         
 root = tk.Tk()
 
-
 user_filename_open = "none"
 user_filename_save = "none"
 user_filename_save_clash_json = "none"
@@ -313,7 +312,7 @@ image_original = None   #PilImage.new("RGB", (HIRES_WIDTH,HIRES_HEIGHT), "black"
 #image_preview = None    #PilImage.new("RGB", (HIRES_WIDTH,HIRES_HEIGHT), "black")
 image_koala = None  #PilImage.new("RGBA", (HIRES_WIDTH,HIRES_HEIGHT), "black")
 image_preview_convert = None    #PilImage.new("RGB", (KOALA_WIDTH,KOALA_HEIGHT), "black")
-image_koala_new = None
+image_koala_new = PilImage.new("RGBA", (HIRES_WIDTH,HIRES_HEIGHT), "black")
 
 CANVAS_SAFETY_BORDER = 10
 #canvas_koala_width = 1
